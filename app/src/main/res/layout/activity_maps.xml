@@ -14,13 +14,28 @@
               android:id="@+id/map"
               tools:context=".activities.MapsActivity"
               android:name="com.google.android.gms.maps.SupportMapFragment"
-              map:layout_constraintBottom_toTopOf="@+id/button"
-              map:layout_constraintTop_toTopOf="parent"/>
+              map:layout_constraintTop_toTopOf="parent"
+              map:layout_constraintBottom_toBottomOf="parent"/>
 
-    <Button android:layout_width="wrap_content" android:layout_height="wrap_content"
+    <Button android:layout_width="match_parent"
+            android:layout_height="wrap_content"
             android:text="Help"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            android:id="@+id/button"/>
+            android:id="@+id/help"/>
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/myLocFloatingActionButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:clickable="true"
+            android:backgroundTint="#FFF"
+            app:borderWidth="0dp"
+            app:srcCompat="@drawable/ic_directions_bike_black_24dp"
+            app:layout_constraintRight_toRightOf="parent"
+            android:layout_margin="16dp"
+            app:layout_constraintBottom_toTopOf="@+id/help"/>
+
+
 </androidx.constraintlayout.widget.ConstraintLayout>
