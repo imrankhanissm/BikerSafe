@@ -29,7 +29,6 @@
             android:id="@+id/myLocFloatingActionButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:clickable="true"
             android:backgroundTint="#FFF"
             app:borderWidth="0dp"
             app:srcCompat="@drawable/ic_directions_bike_black_24dp"
