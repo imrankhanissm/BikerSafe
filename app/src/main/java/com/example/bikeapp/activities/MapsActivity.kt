@@ -3,6 +3,7 @@ package com.example.bikeapp.activities
 import android.Manifest
 import android.annotation.SuppressLint
 import android.content.Context
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Color
 import android.hardware.Sensor
@@ -16,9 +17,16 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.CountDownTimer
 import android.util.Log
+import android.view.Menu
+import android.view.MenuInflater
+import android.view.MenuItem
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
+import androidx.core.content.ContextCompat
+import com.example.bikeapp.Constants
 import com.example.bikeapp.R
+import com.example.bikeapp.models.User
+import com.example.bikeapp.services.MyIntentService
 
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
@@ -29,32 +37,34 @@ import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.android.synthetic.main.activity_maps.*
+import kotlin.math.max
+import kotlin.math.min
 
 class MapsActivity : AppCompatActivity(), OnMapReadyCallback, SensorEventListener {
 
     private var locationPermissionCode = 1
-    private var waitTime = 5000L
+    private var waitTime = 2000L
     private var driveMode = false
 
     private lateinit var mMap: GoogleMap
-    private lateinit var locationManager: LocationManager
     private lateinit var sensorManager: SensorManager
+    private lateinit var locationManager: LocationManager
     private lateinit var locationListener: LocationListener
     private lateinit var alertDialog: AlertDialog
     private var snackBar: Snackbar? = null
     private var lastLocation: Location? = null
     private var countDownTimer: CountDownTimer = object: CountDownTimer(waitTime, 1000){
                                                     override fun onFinish() {
-                                                        alertDialog?.dismiss()
+                                                        alertDialog.dismiss()
                                                         Toast.makeText(applicationContext, "time up alert sent", Toast.LENGTH_SHORT).show()
                                                     }
 
                                                     override fun onTick(millisUntilFinished: Long) {
-                                                        alertDialog?.setMessage("Sending alert in " + millisUntilFinished/1000)
+                                                        alertDialog.setMessage("Sending alert in " + millisUntilFinished/1000)
                                                     }
                                                 }
 
-    private val accelerationThreshold: Float = 35F // 78
+    private val accelerationThreshold: Float = 12F // 78
     private val gyroscopeThreshold: Float = 12F // 17
     private var accelerometerArray: FloatArray = floatArrayOf(0F, 0F, 0F)
     private var gyroscopeArray: FloatArray = floatArrayOf(0F, 0F, 0F)
@@ -65,16 +75,26 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, SensorEventListene
     private var gyroscopeMinArray: FloatArray = floatArrayOf(0F, 0F, 0F)
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        Log.d("mytag", "oncreate")
         super.onCreate(savedInstanceState)
+        val myPrefs = getSharedPreferences(Constants.sharedPrefsName, Context.MODE_PRIVATE)
+        if(!myPrefs.contains("notFirst")) {
+            startActivity(Intent(this, SplashScreenActivity::class.java))
+            finish()
+            return
+        }else if(!myPrefs.contains(User.name)){
+            startActivity(Intent(this, RegisterActivity::class.java))
+            finish()
+            return
+        }
+
+        supportActionBar?.title = "Biker App"
+        Log.d("mytag", "oncreate")
         setContentView(R.layout.activity_maps)
         val mapFragment = supportFragmentManager
             .findFragmentById(R.id.map) as SupportMapFragment
         mapFragment.getMapAsync(this)
-        locationManager = getSystemService(Context.LOCATION_SERVICE) as LocationManager
-        sensorManager = getSystemService(Context.SENSOR_SERVICE) as SensorManager
         alertDialog = AlertDialog.Builder(this).
-                                    setTitle(title).
+                                    setTitle("").
                                     setMessage("Sending alert in __secs")
                                     .setPositiveButton("SendNow"){ _, _ ->
                                         countDownTimer.cancel()
@@ -85,7 +105,10 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, SensorEventListene
                                         Toast.makeText(this, "alert canceled", Toast.LENGTH_SHORT).show()
                                     }
                                     .create()
+//        alertDialog.setCancelable(true)
 
+        sensorManager = getSystemService(Context.SENSOR_SERVICE) as SensorManager
+        locationManager = getSystemService(Context.LOCATION_SERVICE) as LocationManager
         locationListener = object: LocationListener {
             override fun onStatusChanged(provider: String?, status: Int, extras: Bundle?) {}
 
@@ -97,7 +120,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, SensorEventListene
                 Log.d("debug: ", location!!.provider.toString() + ", accuracy: " + location.accuracy.toString() + ", speed: " + location.speed.toString())
                 lastLocation = location
                 mMap.clear()
-                var locLatLng = LatLng(location.latitude, location.longitude)
+                val locLatLng = LatLng(location.latitude, location.longitude)
 
                 var zoomLevel = 19 - ((location.accuracy)/3000.0 * 6)
                 if(location.accuracy > 100) {
@@ -124,8 +147,22 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, SensorEventListene
             sendAlert("Help")
         }
 
-//        var intent = Intent(this, MyIntentService::class.java)
-////        ContextCompat.startForegroundService(this, intent)
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        val inflater = MenuInflater(this)
+        inflater.inflate(R.menu.maps_menu, menu)
+        return super.onCreateOptionsMenu(menu)
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem?): Boolean {
+        if(item?.itemId == R.id.mapsMenuProfile){
+            val intent = Intent(this, ProfileActivity::class.java)
+            startActivity(intent)
+        }else if(item?.itemId == R.id.mapsMenuSettings){
+            Toast.makeText(this, "Settings", Toast.LENGTH_SHORT)
+        }
+        return super.onOptionsItemSelected(item)
     }
 
     private fun toggleDriveMode(){
@@ -145,6 +182,9 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, SensorEventListene
                 registerSensorListeners()
                 myLocFloatingActionButton.setImageResource(R.drawable.ic_directions_bike_blue_24dp)
                 driveMode = true
+                // start service
+                val intent = Intent(this, MyIntentService::class.java)
+                ContextCompat.startForegroundService(this, intent)
             }else{
                 snackBar = Snackbar.make(myLocFloatingActionButton, "Enable location", Snackbar.LENGTH_SHORT)
                 snackBar?.show()
@@ -153,17 +193,27 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, SensorEventListene
     }
 
     private fun driveModeOff() {
-        sensorManager.unregisterListener(this)
-        locationManager.removeUpdates(locationListener)
+        unregisterSensorListeners()
+        removeLocationUpdates()
         myLocFloatingActionButton.setImageResource(R.drawable.ic_directions_bike_black_24dp)
         mMap.clear()
         driveMode = false
+        val intent = Intent(this, MyIntentService::class.java)
+        stopService(intent)
     }
 
     private fun registerSensorListeners(){
         sensorManager.registerListener(this, sensorManager.getDefaultSensor(Sensor.TYPE_LINEAR_ACCELERATION), SensorManager.SENSOR_DELAY_NORMAL)
         sensorManager.registerListener(this, sensorManager.getDefaultSensor(Sensor.TYPE_GYROSCOPE), SensorManager.SENSOR_DELAY_NORMAL)
         Log.d("debug", "registered sensor listeners")
+    }
+
+    private fun unregisterSensorListeners(){
+        sensorManager.unregisterListener(this)
+    }
+
+    private fun removeLocationUpdates(){
+        locationManager.removeUpdates(locationListener)
     }
 
     @SuppressLint("MissingPermission")
@@ -188,31 +238,31 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, SensorEventListene
     override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) { }
 
     override fun onSensorChanged(event: SensorEvent?) {
-        var x: Float = event!!.values[0]
-        var y: Float = event.values[1]
-        var z: Float = event.values[2]
+        val x: Float = event!!.values[0]
+        val y: Float = event.values[1]
+        val z: Float = event.values[2]
         if(event.sensor.type == Sensor.TYPE_LINEAR_ACCELERATION){
             accelerometerArray = floatArrayOf(x, y, z)
             for(i in 0..2){
-                accelerometerMaxArray[i] = Math.max(accelerometerMaxArray[i], x)
-                accelerometerMaxArray[i] = Math.max(accelerometerMaxArray[i], y)
-                accelerometerMaxArray[i] = Math.max(accelerometerMaxArray[i], z)
+                accelerometerMaxArray[i] = max(accelerometerMaxArray[i], x)
+                accelerometerMaxArray[i] = max(accelerometerMaxArray[i], y)
+                accelerometerMaxArray[i] = max(accelerometerMaxArray[i], z)
 
-                accelerometerMinArray[i] = Math.min(accelerometerMinArray[i], x)
-                accelerometerMinArray[i] = Math.min(accelerometerMinArray[i], y)
-                accelerometerMinArray[i] = Math.min(accelerometerMinArray[i], z)
+                accelerometerMinArray[i] = min(accelerometerMinArray[i], x)
+                accelerometerMinArray[i] = min(accelerometerMinArray[i], y)
+                accelerometerMinArray[i] = min(accelerometerMinArray[i], z)
             }
-            maxGyroValue = Math.max(maxGyroValue, Math.max(x, Math.max(y, z)))
+            maxGyroValue = max(maxGyroValue, max(x, max(y, z)))
         }else if(event.sensor.type == Sensor.TYPE_GYROSCOPE){
             gyroscopeArray = floatArrayOf(x, y, z)
             for(i in 0..2){
-                gyroscopeMaxArray[i] = Math.max(gyroscopeMaxArray[i], x)
-                gyroscopeMaxArray[i] = Math.max(gyroscopeMaxArray[i], y)
-                gyroscopeMaxArray[i] = Math.max(gyroscopeMaxArray[i], z)
+                gyroscopeMaxArray[i] = max(gyroscopeMaxArray[i], x)
+                gyroscopeMaxArray[i] = max(gyroscopeMaxArray[i], y)
+                gyroscopeMaxArray[i] = max(gyroscopeMaxArray[i], z)
 
-                gyroscopeMinArray[i] = Math.min(gyroscopeMinArray[i], x)
-                gyroscopeMinArray[i] = Math.min(gyroscopeMinArray[i], y)
-                gyroscopeMinArray[i] = Math.min(gyroscopeMinArray[i], z)
+                gyroscopeMinArray[i] = min(gyroscopeMinArray[i], x)
+                gyroscopeMinArray[i] = min(gyroscopeMinArray[i], y)
+                gyroscopeMinArray[i] = min(gyroscopeMinArray[i], z)
             }
         }
         var totalAcc = 0F
@@ -236,28 +286,15 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, SensorEventListene
     }
 
     private fun sendAlert(title: String){
+        Log.d("debug", "collision detected")
         countDownTimer.start()
-
-//        alertDialog = AlertDialog.Builder(this).
-//            setTitle(title).
-//            setMessage("Sending alert in __secs")
-//            .setPositiveButton("SendNow"){ _, _ ->
-//                countDownTimer.cancel()
-//                Toast.makeText(this, "alert sent", Toast.LENGTH_SHORT).show()
-//            }
-//            .setNegativeButton("Cancel"){ _, _ ->
-//                countDownTimer.cancel()
-//                Toast.makeText(this, "alert canceled", Toast.LENGTH_SHORT).show()
-//            }
-//            .create()
-
-        alertDialog.setCancelable(true)
+        alertDialog.setTitle(title)
         alertDialog.show()
     }
 
-    @SuppressLint("MissingPermission")
+//    @SuppressLint("MissingPermission")
     override fun onMapReady(googleMap: GoogleMap) {
         mMap = googleMap
-        mMap.isMyLocationEnabled = true
+//        mMap.isMyLocationEnabled = true
     }
 }

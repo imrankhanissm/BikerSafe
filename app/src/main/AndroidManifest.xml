@@ -42,22 +42,17 @@
                 android:value="@string/google_maps_key"/>
 
         <activity
-                android:name=".activities.MapsActivity"
-                android:label="@string/title_activity_maps">
-        </activity>
-        <activity android:name=".activities.SettingActivity">
-        </activity>
-        <activity android:name=".activities.ProfileActivity">
-        </activity>
-        <activity android:name=".activities.RegisterActivity">
-        </activity>
-        <activity android:name=".activities.MainActivity">
+                android:name=".activities.MapsActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
 
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
+        <activity android:name=".activities.SettingActivity"/>
+        <activity android:name=".activities.ProfileActivity"/>
+        <activity android:name=".activities.RegisterActivity"/>
+        <activity android:name=".activities.SplashScreenActivity"/>
     </application>
 
 </manifest>
