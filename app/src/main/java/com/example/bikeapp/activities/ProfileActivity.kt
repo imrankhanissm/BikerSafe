@@ -1,10 +1,10 @@
 package com.example.bikeapp.activities
 
 import android.content.Context
-import android.content.DialogInterface
 import android.content.SharedPreferences
 import android.os.Bundle
 import android.util.Log
+import android.view.View
 import android.widget.EditText
 import android.widget.LinearLayout
 import android.widget.TextView
@@ -14,8 +14,10 @@ import androidx.appcompat.app.AppCompatActivity
 import com.example.bikeapp.Constants
 import com.example.bikeapp.R
 import com.example.bikeapp.dbHelper.DBHelper
+import com.example.bikeapp.models.Contact
 import com.example.bikeapp.models.User
 import kotlinx.android.synthetic.main.activity_profile.*
+import org.w3c.dom.Text
 
 class ProfileActivity : AppCompatActivity() {
 
@@ -74,96 +76,74 @@ class ProfileActivity : AppCompatActivity() {
         dbHelper = DBHelper(this)
         var contacts = dbHelper.getContacts()
 
-        for (i in contacts){
-            val contact = TextView(this)
-            val layoutParams = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT)
-            contact.layoutParams = layoutParams
-            contact.text = i
-            contact.textSize = 20F
-            contact.setPadding(8, 8, 8, 40)
-            contact.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_edit_black_24dp, 0)
-            contact.setOnClickListener {
-                val dialogBuilder = AlertDialog.Builder(this)
-                val dialogView = layoutInflater.inflate(R.layout.dialog_edit_name, null)
-                dialogView.findViewById<EditText>(R.id.mapsMenuProfileEdit)?.setText(contact.text)
-                dialogBuilder.setView(dialogView)
-                dialogBuilder.setTitle("Edit Contact")
-                dialogBuilder.setNegativeButton("cancel") { dialog, which ->
-                    dialog.dismiss()
-                }
-                dialogBuilder.setPositiveButton("save") { dialog, which ->
-                    val newName = (dialog as AlertDialog).findViewById<EditText>(R.id.mapsMenuProfileEdit)?.text.toString()
-                    Log.d("debug", newName)
-
-                    dbHelper.updateContact(contact.text.toString(), newName)
-                    contact.text = newName
-                }
-                dialogBuilder.setNeutralButton("delete") { dialog, which ->
-                    if(emergencyContactListProfile.childCount > 1){
-                        Log.d("debug", "delete contact")
-                        dbHelper.deleteContact(contact.text.toString())
-                        emergencyContactListProfile.removeView(contact)
-                    }else{
-                        Toast.makeText(this, "Atleast one emergency contact required", Toast.LENGTH_SHORT).show()
-                    }
-                }
-                dialogBuilder.show()
+        if (contacts != null) {
+            for (i in contacts){
+                val contactView = generateContactView(i)
+                emergencyContactListProfile.addView(contactView)
             }
-            emergencyContactListProfile.addView(contact)
         }
 
         addMoreEmergencyContactsProfile.setOnClickListener {
             val dialogBuilder = AlertDialog.Builder(this)
-            val dialogView = layoutInflater.inflate(R.layout.dialog_edit_name, null)
+            val dialogView = layoutInflater.inflate(R.layout.dialog_add_contact, null)
             dialogBuilder.setView(dialogView)
             dialogBuilder.setTitle("Add Contact")
             dialogBuilder.setNegativeButton("cancel") { dialog, which ->
                 dialog.dismiss()
             }
             dialogBuilder.setPositiveButton("add") { dialog, which ->
-                val newContact = (dialog as AlertDialog).findViewById<EditText>(R.id.mapsMenuProfileEdit)?.text.toString()
-                Log.d("debug", newContact)
-
-                dbHelper.insertContact(newContact)
-                val contact = TextView(this)
-                val layoutParams = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT)
-                contact.layoutParams = layoutParams
-                contact.text = newContact
-                contact.textSize = 20F
-                contact.setPadding(8, 8, 8, 40)
-                contact.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_edit_black_24dp, 0)
-
-                contact.setOnClickListener {
-                    val dialogBuilder = AlertDialog.Builder(this)
-                    val dialogView = layoutInflater.inflate(R.layout.dialog_edit_name, null)
-                    dialogView.findViewById<EditText>(R.id.mapsMenuProfileEdit)?.setText(contact.text)
-                    dialogBuilder.setView(dialogView)
-                    dialogBuilder.setTitle("Edit Contact")
-                    dialogBuilder.setNegativeButton("cancel", DialogInterface.OnClickListener{ dialog, which ->
-                        dialog.dismiss()
-                    })
-                    dialogBuilder.setPositiveButton("save", DialogInterface.OnClickListener { dialog, which ->
-                        val newName = (dialog as AlertDialog).findViewById<EditText>(R.id.mapsMenuProfileEdit)?.text.toString()
-                        Log.d("debug", newName)
-
-                        dbHelper.updateContact(contact.text.toString(), newName)
-                        contact.text = newName
-                    })
-                    dialogBuilder.setNeutralButton("delete", DialogInterface.OnClickListener { dialog, which ->
-                        if(emergencyContactListProfile.childCount > 1){
-                            Log.d("debug", "delete contact")
-                            dbHelper.deleteContact(contact.text.toString())
-                            emergencyContactListProfile.removeView(contact)
-                        }else{
-                            Toast.makeText(this, "Atleast one emergency contact required", Toast.LENGTH_SHORT).show()
-                        }
-                    })
-                    dialogBuilder.show()
+                val countryCode = (dialog as AlertDialog).findViewById<EditText>(R.id.countryCodeAddContactProfile)?.text.toString()
+                val phoneNo = (dialog).findViewById<EditText>(R.id.phoneNoAddContactProfile)?.text.toString()
+                val contact = Contact(countryCode, phoneNo)
+                if(dbHelper.insertContact(contact)){
+                    val contactView = generateContactView(contact)
+                    emergencyContactListProfile.addView(contactView)
                 }
-                emergencyContactListProfile.addView(contact)
             }
             dialogBuilder.show()
         }
+    }
+
+    private fun generateContactView(contact: Contact): View {
+        val contactView = layoutInflater.inflate(R.layout.layout_contact, null)
+        contactView.findViewById<TextView>(R.id.countryCodeProfile).text = contact.countryCode
+        contactView.findViewById<TextView>(R.id.phoneNoProfile).text = contact.phoneNo
+        contactView.setOnClickListener {
+            val dialogBuilder = AlertDialog.Builder(this)
+            val dialogView = layoutInflater.inflate(R.layout.dialog_add_contact, null)
+            dialogView.findViewById<EditText>(R.id.countryCodeAddContactProfile)?.setText(contactView.findViewById<TextView>(R.id.countryCodeProfile).text)
+            dialogView.findViewById<EditText>(R.id.phoneNoAddContactProfile)?.setText(contactView.findViewById<TextView>(R.id.phoneNoProfile).text)
+            dialogBuilder.setView(dialogView)
+            dialogBuilder.setTitle("Edit Contact")
+            dialogBuilder.setNegativeButton("cancel") { dialog, which ->
+                dialog.dismiss()
+            }
+            dialogBuilder.setPositiveButton("save") { dialog, which ->
+                val oldCountryCode = contactView.findViewById<TextView>(R.id.countryCodeProfile)?.text.toString()
+                val oldPhoneNo = contactView.findViewById<TextView>(R.id.phoneNoProfile)?.text.toString()
+
+                val newCountryCode = (dialog as AlertDialog).findViewById<EditText>(R.id.countryCodeAddContactProfile)?.text.toString()
+                val newPhoneNo = (dialog).findViewById<EditText>(R.id.phoneNoAddContactProfile)?.text.toString()
+
+                if(dbHelper.updateContact(Contact(oldCountryCode, oldPhoneNo), Contact(newCountryCode, newPhoneNo))){
+                    contactView.findViewById<TextView>(R.id.countryCodeProfile).text = newCountryCode
+                    contactView.findViewById<TextView>(R.id.phoneNoProfile).text = newPhoneNo
+                }
+            }
+            dialogBuilder.setNeutralButton("delete") { dialog, which ->
+                val newCountryCode = contactView.findViewById<TextView>(R.id.countryCodeProfile)?.text.toString()
+                val newPhoneNo = contactView.findViewById<TextView>(R.id.phoneNoProfile)?.text.toString()
+                if(emergencyContactListProfile.childCount > 1){
+                    if(dbHelper.deleteContact(Contact(newCountryCode, newPhoneNo))){
+                        emergencyContactListProfile.removeView(contactView)
+                    }
+                }else{
+                    Toast.makeText(this, "Atleast one emergency contact required", Toast.LENGTH_SHORT).show()
+                }
+            }
+            dialogBuilder.show()
+        }
+        return contactView
     }
 
     override fun onSupportNavigateUp(): Boolean {

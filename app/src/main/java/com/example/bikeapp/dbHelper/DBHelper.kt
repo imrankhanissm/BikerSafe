@@ -7,85 +7,108 @@ import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteException
 import android.database.sqlite.SQLiteOpenHelper
 import android.util.Log
+import android.widget.Toast
+import com.example.bikeapp.models.Contact
 
-class DBHelper(context: Context): SQLiteOpenHelper(context, DATABASE_NAME, null, DATABASE_VERSION) {
+class DBHelper(context: Context) :
+    SQLiteOpenHelper(context, DATABASE_NAME, null, DATABASE_VERSION) {
 
-//    private var db: SQLiteDatabase? = null
-    companion object{
+    private val context = context
+    companion object {
         private var DATABASE_NAME = "emergencyContacts"
         private var DATABASE_VERSION = 1
         private var EMERGENCY_CONTACTS_TABLE_NAME = "emergencyContacts"
         private var COLUMN_ID = "id"
-        private var COLUMN_CONTACT = "contact"
     }
 
     override fun onCreate(db: SQLiteDatabase?) {
-//        this.db = db
-        var createTable ="create table $EMERGENCY_CONTACTS_TABLE_NAME ($COLUMN_ID integer primary key, $COLUMN_CONTACT text)"
+//        , constraint unique_constraint unique(${Contact.countryCodeLable}, ${Contact.phoneNoLabel})
+        val createTable =
+            "create table $EMERGENCY_CONTACTS_TABLE_NAME ($COLUMN_ID integer primary key autoincrement, ${Contact.countryCodeLable} text, ${Contact.phoneNoLabel} text)"
         db!!.execSQL(createTable)
     }
 
-    override fun onUpgrade(db: SQLiteDatabase?, oldVersion: Int, newVersion: Int) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
+    override fun onUpgrade(db: SQLiteDatabase?, oldVersion: Int, newVersion: Int) {}
 
-    fun getContacts():List<String>{
-        var contacts = ArrayList<String>()
-        var query = "select * from $EMERGENCY_CONTACTS_TABLE_NAME"
-        var cursor: Cursor? = null
-        var dbl = readableDatabase
-        try{
+    fun getContacts(): List<Contact>? {
+        val contacts = ArrayList<Contact>()
+        val query = "select * from $EMERGENCY_CONTACTS_TABLE_NAME"
+        var cursor: Cursor?
+        val dbl = readableDatabase
+        try {
             cursor = dbl?.rawQuery(query, null)
-        }catch (e: SQLiteException){
+        } catch (e: SQLiteException) {
+            dbl.close()
             Log.d("debug", "sqlite exception: " + e.message)
+            return null
         }
-        if(cursor!!.moveToFirst()){
-            do{
-                contacts.add(cursor.getString(cursor.getColumnIndex(COLUMN_CONTACT)))
-            }while(cursor.moveToNext())
+        if (cursor!!.moveToFirst()) {
+            do {
+                contacts.add(Contact(cursor.getString(cursor.getColumnIndex(Contact.countryCodeLable)), cursor.getString(cursor.getColumnIndex(Contact.phoneNoLabel))))
+            } while (cursor.moveToNext())
         }
         cursor.close()
+        dbl.close()
         return contacts
     }
 
-    fun insertContact(contact: String){
-        var cv = ContentValues()
-        cv.put(COLUMN_CONTACT, contact)
-        var dbl = writableDatabase
-        try{
-            dbl.insert(EMERGENCY_CONTACTS_TABLE_NAME, null, cv)
-        }catch (e: SQLiteException){
-            Log.d("debug", "sqlite exception: " + e.message)
-        }
-    }
-
-    fun updateContact(oldContact: String, newContact: String): Boolean{
-        var cv = ContentValues()
-        cv.put(COLUMN_CONTACT, newContact)
-        var dbl = writableDatabase
+    fun insertContact(contact: Contact): Boolean {
+        val cv = ContentValues()
+        cv.put(Contact.countryCodeLable, contact.countryCode)
+        cv.put(Contact.phoneNoLabel, contact.phoneNo)
+        val dbl = writableDatabase
         try {
-            if(dbl.update(EMERGENCY_CONTACTS_TABLE_NAME, cv, COLUMN_CONTACT + "=" + oldContact, null) > 0){
+            if(dbl.insert(EMERGENCY_CONTACTS_TABLE_NAME, null, cv) > 0){
+                dbl.close()
                 return true
+            }else{
+                Toast.makeText(context, "Error inserting contact", Toast.LENGTH_SHORT).show()
             }
-        }catch (e: Exception){
-            Log.d("debug", "exception: " + e.message)
+        } catch (e: Exception) {
+            Log.d("debug", "sqlite exception: " + e.message)
+            dbl.close()
             return false
         }
+        dbl.close()
         return false
     }
 
-    fun deleteContact(contact: String): Boolean{
-        var cv = ContentValues()
-        cv.put(COLUMN_CONTACT, contact)
-        var dbl = writableDatabase
-        try{
-            if(dbl.delete(EMERGENCY_CONTACTS_TABLE_NAME, COLUMN_CONTACT + "=" + contact, null) > 0){
+    fun updateContact(oldContact: Contact, newContact: Contact): Boolean {
+        val cv = ContentValues()
+        cv.put(Contact.countryCodeLable, newContact.countryCode)
+        cv.put(Contact.phoneNoLabel, newContact.phoneNo)
+        val dbl = writableDatabase
+        try {
+            if (dbl.update(EMERGENCY_CONTACTS_TABLE_NAME, cv, Contact.countryCodeLable + " =? and " + Contact.phoneNoLabel + " =? ", arrayOf(oldContact.countryCode, oldContact.phoneNo)) > 0){
+                dbl.close()
                 return true
+            }else{
+                Toast.makeText(context, "Error updating contact", Toast.LENGTH_SHORT).show()
             }
-        }catch (e: Exception){
+        } catch (e: Exception) {
             Log.d("debug", "exception: " + e.message)
+            dbl.close()
             return false
         }
+        dbl.close()
+        return false
+    }
+
+    fun deleteContact(contact: Contact): Boolean {
+        val dbl = writableDatabase
+        try {
+            if (dbl.delete(EMERGENCY_CONTACTS_TABLE_NAME, Contact.countryCodeLable + " =? and " + Contact.phoneNoLabel + " =? ", arrayOf(contact.countryCode, contact.phoneNo)) > 0) {
+                dbl.close()
+                return true
+            }else{
+                Toast.makeText(context, "Error deleting contact", Toast.LENGTH_SHORT).show()
+            }
+        } catch (e: Exception) {
+            Log.d("debug", "exception: " + e.message)
+            dbl.close()
+            return false
+        }
+        dbl.close()
         return false
     }
 

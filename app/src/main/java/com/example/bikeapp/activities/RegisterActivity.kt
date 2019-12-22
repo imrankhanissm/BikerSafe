@@ -13,6 +13,7 @@ import androidx.appcompat.app.AppCompatActivity
 import com.example.bikeapp.Constants
 import com.example.bikeapp.R
 import com.example.bikeapp.dbHelper.DBHelper
+import com.example.bikeapp.models.Contact
 import com.example.bikeapp.models.User
 import kotlinx.android.synthetic.main.activity_register.*
 
@@ -24,11 +25,25 @@ class RegisterActivity : AppCompatActivity() {
         setContentView(R.layout.activity_register)
 
         addMoreEmergencyContacts.setOnClickListener {
+
+            val moreCountryCode = EditText(this)
+//            moreCountryCode.hint = "Country code"
+            moreCountryCode.setText("+91")
+            moreCountryCode.layoutParams =
+                ViewGroup.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT)
+
             val moreContact = EditText(this)
             moreContact.hint = "Emergency Contact " + (emergencyContactListRegister.childCount + 1)
             moreContact.layoutParams =
                 ViewGroup.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT)
-            emergencyContactListRegister.addView(moreContact)
+
+            val moreContactLayout = LinearLayout(this)
+            moreContactLayout.addView(moreCountryCode)
+            moreContactLayout.addView(moreContact)
+            moreContactLayout.layoutParams =
+                ViewGroup.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT)
+
+            emergencyContactListRegister.addView(moreContactLayout)
             moreContact.requestFocus()
         }
 
@@ -56,14 +71,19 @@ class RegisterActivity : AppCompatActivity() {
 
 
                     for(i in 0 until emergencyContactListRegister.childCount){
-                        if((emergencyContactListRegister.getChildAt(i) as EditText).text.isNotEmpty()){
-                            dbHelper.insertContact((emergencyContactListRegister.getChildAt(i) as EditText).text.toString())
+                        if(((emergencyContactListRegister.getChildAt(i) as LinearLayout).getChildAt(0) as EditText).text.isNotEmpty() &&
+                            ((emergencyContactListRegister.getChildAt(i) as LinearLayout).getChildAt(1) as EditText).text.isNotEmpty()){
+                            val contact = Contact(((emergencyContactListRegister.getChildAt(i) as LinearLayout).getChildAt(0) as EditText).text.toString(),
+                                ((emergencyContactListRegister.getChildAt(i) as LinearLayout).getChildAt(1) as EditText).text.toString())
+                            dbHelper.insertContact(contact)
                         }
                     }
 
                     val contacts = dbHelper.getContacts()
-                    for(i in contacts){
-                        Log.d("debug", "emergency contact from database: $i")
+                    if (contacts != null) {
+                        for(i in contacts){
+                            Log.d("debug", "emergency contact from database: $i")
+                        }
                     }
                 }catch (e: Exception){
                     Toast.makeText(this, "Exception: ${e.message}", Toast.LENGTH_SHORT).show()
