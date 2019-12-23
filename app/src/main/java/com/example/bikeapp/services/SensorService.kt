@@ -1,8 +1,8 @@
 package com.example.bikeapp.services
 
-import android.annotation.TargetApi
 import android.app.NotificationChannel
 import android.app.NotificationManager
+import android.app.PendingIntent
 import android.app.Service
 import android.content.Context
 import android.content.Intent
@@ -12,14 +12,17 @@ import android.hardware.SensorEventListener
 import android.hardware.SensorManager
 import android.location.Location
 import android.os.Build
+import android.os.HandlerThread
 import android.os.IBinder
 import android.os.Looper
 import android.util.Log
+import android.widget.Toast
 import androidx.core.app.NotificationCompat
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.example.bikeapp.Constants
 import com.example.bikeapp.R
 import com.example.bikeapp.activities.AlertDialogActivity
+import com.example.bikeapp.activities.MapsActivity
 import com.google.android.gms.location.*
 import kotlin.math.max
 import kotlin.math.min
@@ -53,8 +56,6 @@ class SensorService : Service(), SensorEventListener {
     }
 
     override fun onCreate() {
-
-        Log.d("debug", "sensor service oncreate")
         serviceActive = true
         sensorManager = getSystemService(Context.SENSOR_SERVICE) as SensorManager
         locationProvider = LocationServices.getFusedLocationProviderClient(this)
@@ -67,21 +68,37 @@ class SensorService : Service(), SensorEventListener {
         }
     }
 
-    @TargetApi(Build.VERSION_CODES.O)
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        val channelId = "ch1"
-        val notChannel = NotificationChannel(channelId, "channel1", NotificationManager.IMPORTANCE_DEFAULT)
+        if (intent != null) {
+            if(intent.hasExtra("stop")){
+                stopSelf()
+                return START_NOT_STICKY
+            }
+        }
+        val mapsActivityIntent = Intent(this, MapsActivity::class.java)
+        val pendingIntent = PendingIntent.getActivity(this, 0, mapsActivityIntent, 0)
+
+        val stopServiceIntent = Intent(this, SensorService::class.java)
+        stopServiceIntent.putExtra("stop", true)
+        val stopServicePendingIntent = PendingIntent.getService(this, 0, stopServiceIntent, 0)
+
         val notMng = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        val channelId = "ch1"
         val not = NotificationCompat.Builder(this, channelId).setContentTitle("Biker App")
             .setContentText("Drive Mode On")
+            .setColor(getColor(R.color.colorPrimary))
             .setSmallIcon(R.drawable.ic_directions_bike_blue_24dp)
-            .setChannelId(channelId)
+            .setContentIntent(pendingIntent)
+            .addAction(R.drawable.ic_directions_bike_blue_24dp, "Turn off drive mode", stopServicePendingIntent)
             .build()
-        notMng.createNotificationChannel(notChannel)
+
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
+            val notChannel = NotificationChannel(channelId, "channel1", NotificationManager.IMPORTANCE_HIGH)
+            notMng.createNotificationChannel(notChannel)
+        }
         notMng.notify(1, not)
 
         startForeground(1, not)
-
         requestLocationUpdates()
         registerSensorListeners()
         localBroadcastManager = LocalBroadcastManager.getInstance(this)
@@ -89,7 +106,7 @@ class SensorService : Service(), SensorEventListener {
     }
 
     override fun onDestroy() {
-        Log.d("debug", "sensor service ondestroy")
+        Log.d("debug", "sensor service onDestroy")
         unregisterSensorListeners()
         removeLocationUpdates()
         serviceActive = false
@@ -108,15 +125,19 @@ class SensorService : Service(), SensorEventListener {
     }
 
     private fun requestLocationUpdates(){
+//        val handlerThread = HandlerThread("RequestLocation")
+//        handlerThread.start()
         val locationRequest: LocationRequest = LocationRequest.create()
         locationRequest.priority = LocationRequest.PRIORITY_HIGH_ACCURACY
         locationRequest.interval = 1000
-
         locationProvider.requestLocationUpdates(locationRequest, locationCallback, Looper.getMainLooper())
+//        locationProvider.requestLocationUpdates(locationRequest, locationCallback, handlerThread.looper)
+        Log.d("debug", "requested location updates")
     }
 
     private fun removeLocationUpdates(){
         locationProvider.removeLocationUpdates(locationCallback)
+        Log.d("debug", "removed location updates")
     }
 
     override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) { }

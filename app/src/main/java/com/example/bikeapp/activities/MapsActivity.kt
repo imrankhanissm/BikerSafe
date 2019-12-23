@@ -90,7 +90,6 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
                 val accuracy = intent.extras?.get("accuracy") as Float
                 setMarkerAndCircle(latitude, longitude, accuracy)
             }
-
         }
 
         myLocFloatingActionButton.setOnClickListener {
