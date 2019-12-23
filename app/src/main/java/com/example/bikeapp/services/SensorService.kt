@@ -68,7 +68,7 @@ class SensorService : Service(), SensorEventListener {
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         if (intent != null) {
-            if(intent.hasExtra("stop")){
+            if(intent.hasExtra(Constants.turnOffDriveMode)){
                 stopSelf()
                 return START_NOT_STICKY
             }
@@ -77,8 +77,8 @@ class SensorService : Service(), SensorEventListener {
         val pendingIntent = PendingIntent.getActivity(this, Constants.PENDING_INTENT_REQUEST_CODE_MAPS_ACTIVITY, mapsActivityIntent, 0)
 
         val stopServiceIntent = Intent(this, SensorService::class.java)
-        stopServiceIntent.putExtra("stop", true)
-        val stopServicePendingIntent = PendingIntent.getService(this, 0, stopServiceIntent, 0)
+        stopServiceIntent.putExtra(Constants.turnOffDriveMode, true)
+        val stopServicePendingIntent = PendingIntent.getService(this, 0, stopServiceIntent, PendingIntent.FLAG_CANCEL_CURRENT)
 
         val notMng = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         val channelId = "ch1"
@@ -108,6 +108,7 @@ class SensorService : Service(), SensorEventListener {
         unregisterSensorListeners()
         removeLocationUpdates()
         serviceActive = false
+        localBroadcastManager.sendBroadcast(Intent(Constants.serviceStopped))
         super.onDestroy()
     }
 

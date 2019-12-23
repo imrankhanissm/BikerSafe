@@ -46,8 +46,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-
+        Log.d("lifecycle", "onCreate")
         val myPrefs = getSharedPreferences(Constants.sharedPrefsName, Context.MODE_PRIVATE)
         if(!myPrefs.contains("notFirst")) {
             startActivity(Intent(this, SplashScreenActivity::class.java))
@@ -82,10 +81,16 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         locationManager = getSystemService(Context.LOCATION_SERVICE) as LocationManager
         receiver = object : BroadcastReceiver() {
             override fun onReceive(context: Context?, intent: Intent?) {
-                val latitude = intent?.extras?.get("latitude") as Double
-                val longitude = intent.extras?.get("longitude") as Double
-                val accuracy = intent.extras?.get("accuracy") as Float
-                setMarkerAndCircle(latitude, longitude, accuracy)
+                Log.d("intent", intent?.action)
+                if(intent?.action == Constants.serviceStopped){
+                    myLocFloatingActionButton.setImageResource(R.drawable.ic_directions_bike_black_24dp)
+                    mMap.clear()
+                }else{
+                    val latitude = intent?.extras?.get("latitude") as Double
+                    val longitude = intent.extras?.get("longitude") as Double
+                    val accuracy = intent.extras?.get("accuracy") as Float
+                    setMarkerAndCircle(latitude, longitude, accuracy)
+                }
             }
         }
 
@@ -96,23 +101,24 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         help.setOnClickListener {
             alertDialog.show()
         }
-
+        LocalBroadcastManager.getInstance(this).registerReceiver(receiver, IntentFilter(Constants.locationFromService))
+        LocalBroadcastManager.getInstance(this).registerReceiver(receiver, IntentFilter((Constants.serviceStopped)))
         ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.SEND_SMS, Manifest.permission.READ_PHONE_STATE), locationPermissionCode)
     }
 
     override fun onResume() {
         super.onResume()
+        Log.d("lifecycle", "onResume")
         if(SensorService.serviceActive){
             myLocFloatingActionButton.setImageResource(R.drawable.ic_directions_bike_blue_24dp)
         }else{
             myLocFloatingActionButton.setImageResource(R.drawable.ic_directions_bike_black_24dp)
         }
-        LocalBroadcastManager.getInstance(this).registerReceiver(receiver, IntentFilter(Constants.locationFromService))
     }
 
-    override fun onPause() {
+    override fun onDestroy() {
         LocalBroadcastManager.getInstance(this).unregisterReceiver(receiver)
-        super.onPause()
+        super.onDestroy()
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
