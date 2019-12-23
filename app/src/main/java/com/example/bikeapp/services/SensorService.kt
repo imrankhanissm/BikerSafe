@@ -12,11 +12,9 @@ import android.hardware.SensorEventListener
 import android.hardware.SensorManager
 import android.location.Location
 import android.os.Build
-import android.os.HandlerThread
 import android.os.IBinder
 import android.os.Looper
 import android.util.Log
-import android.widget.Toast
 import androidx.core.app.NotificationCompat
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.example.bikeapp.Constants
@@ -76,7 +74,7 @@ class SensorService : Service(), SensorEventListener {
             }
         }
         val mapsActivityIntent = Intent(this, MapsActivity::class.java)
-        val pendingIntent = PendingIntent.getActivity(this, 0, mapsActivityIntent, 0)
+        val pendingIntent = PendingIntent.getActivity(this, Constants.PENDING_INTENT_REQUEST_CODE_MAPS_ACTIVITY, mapsActivityIntent, 0)
 
         val stopServiceIntent = Intent(this, SensorService::class.java)
         stopServiceIntent.putExtra("stop", true)

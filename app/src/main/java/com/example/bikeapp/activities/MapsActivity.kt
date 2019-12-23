@@ -7,10 +7,8 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.content.pm.PackageManager
 import android.graphics.Color
-import android.location.Location
 import android.location.LocationManager
 import android.os.Bundle
-import android.telephony.SmsManager
 import android.util.Log
 import android.view.Menu
 import android.view.MenuInflater
@@ -25,7 +23,6 @@ import com.example.bikeapp.Constants
 import com.example.bikeapp.R
 import com.example.bikeapp.models.User
 import com.example.bikeapp.services.SensorService
-import com.example.bikeapp.services.SmsService
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
