@@ -78,6 +78,7 @@
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         android:text="Add emergency contact"
+        style="@style/buttonStyle"
         />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
+import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
@@ -26,25 +27,9 @@ class RegisterActivity : AppCompatActivity() {
 
         addMoreEmergencyContacts.setOnClickListener {
 
-            val moreCountryCode = EditText(this)
-//            moreCountryCode.hint = "Country code"
-            moreCountryCode.setText("+91")
-            moreCountryCode.layoutParams =
-                ViewGroup.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT)
-
-            val moreContact = EditText(this)
-            moreContact.hint = "Emergency Contact " + (emergencyContactListRegister.childCount + 1)
-            moreContact.layoutParams =
-                ViewGroup.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT)
-
-            val moreContactLayout = LinearLayout(this)
-            moreContactLayout.addView(moreCountryCode)
-            moreContactLayout.addView(moreContact)
-            moreContactLayout.layoutParams =
-                ViewGroup.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT)
-
+            val moreContactLayout = layoutInflater.inflate(R.layout.layout_contact_edit, null)
+            moreContactLayout.findViewById<EditText>(R.id.moreContactPhoneRegister).hint = "Emergency Contact " + (emergencyContactListRegister.childCount + 1)
             emergencyContactListRegister.addView(moreContactLayout)
-            moreContact.requestFocus()
         }
 
         removeMoreEmergencyContacts.setOnClickListener{

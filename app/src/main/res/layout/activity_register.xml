@@ -33,7 +33,6 @@
                 android:layout_height="wrap_content"
                 android:layout_margin="8dp"
                 android:hint="Blood Group"
-                android:inputType="text"
                 app:layout_constraintTop_toBottomOf="@id/usernameRegister" />
 
 
@@ -55,12 +54,14 @@
                         android:id="@+id/countryCodeRegister"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="+91"/>
+                        android:text="+91"
+                        android:inputType="phone"/>
                     <EditText
                         android:id="@+id/emergencyContact1"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:hint="Emergency Contact" />
+                        android:hint="Emergency Contact"
+                        android:inputType="phone"/>
                 </LinearLayout>
             </LinearLayout>
 
@@ -94,7 +95,8 @@
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintLeft_toLeftOf="parent"
                 app:layout_constraintRight_toRightOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/addRemoveButtonsRegister" />
+                app:layout_constraintTop_toBottomOf="@id/addRemoveButtonsRegister"
+                style="@style/buttonStyle"/>
         </androidx.constraintlayout.widget.ConstraintLayout>
     </ScrollView>
 </androidx.constraintlayout.widget.ConstraintLayout>
