@@ -106,7 +106,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         super.onResume()
         Log.d("lifecycle", "onResume")
         if(SensorService.serviceActive){
-            myLocFloatingActionButton.setImageResource(R.drawable.ic_directions_bike_blue_24dp)
+            myLocFloatingActionButton.setImageResource(R.drawable.ic_directions_bike_color_primary_24dp)
         }else{
             myLocFloatingActionButton.setImageResource(R.drawable.ic_directions_bike_black_24dp)
         }
@@ -126,11 +126,9 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
     }
 
     override fun onOptionsItemSelected(item: MenuItem?): Boolean {
-        if(item?.itemId == R.id.mapsMenuProfile){
-            val intent = Intent(this, ProfileActivity::class.java)
+        if(item?.itemId == R.id.mapsMenuSettings){
+            val intent = Intent(this, SettingActivity::class.java)
             startActivity(intent)
-        }else if(item?.itemId == R.id.mapsMenuSettings){
-            Toast.makeText(this, "Settings", Toast.LENGTH_SHORT).show()
         }
         return super.onOptionsItemSelected(item)
     }
@@ -148,7 +146,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
             ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.SEND_SMS, Manifest.permission.READ_PHONE_STATE), locationPermissionCode)
         }else{
             if(locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)){
-                myLocFloatingActionButton.setImageResource(R.drawable.ic_directions_bike_blue_24dp)
+                myLocFloatingActionButton.setImageResource(R.drawable.ic_directions_bike_color_primary_24dp)
                 // start service
                 val intent = Intent(this, SensorService::class.java)
                 ContextCompat.startForegroundService(this, intent)
@@ -198,10 +196,9 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         mMap.addCircle(CircleOptions().
             center(locLatLng).
             radius(accuracy.toDouble()).
-            strokeColor(Color.rgb(0, 0, 250)).
+            strokeColor(getColor(R.color.colorPrimary)).
             strokeWidth(2F).
-            fillColor(Color.argb(50, 0, 0, 250)).
-            zIndex(0.5F))
+            fillColor(Color.argb(50, Color.red(getColor(R.color.colorPrimary)), Color.green(getColor(R.color.colorPrimary)), Color.blue(getColor(R.color.colorPrimary)))))
         mMap.addMarker(MarkerOptions().position(locLatLng))
         mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(locLatLng, zoomLevel.toFloat()))
     }

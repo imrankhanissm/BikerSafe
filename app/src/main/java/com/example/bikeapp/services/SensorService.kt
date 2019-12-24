@@ -85,9 +85,9 @@ class SensorService : Service(), SensorEventListener {
         val not = NotificationCompat.Builder(this, channelId).setContentTitle("Biker App")
             .setContentText("Drive Mode On")
             .setColor(getColor(R.color.colorPrimary))
-            .setSmallIcon(R.drawable.ic_directions_bike_blue_24dp)
+            .setSmallIcon(R.drawable.ic_directions_bike_color_primary_24dp)
             .setContentIntent(pendingIntent)
-            .addAction(R.drawable.ic_directions_bike_blue_24dp, "Turn off drive mode", stopServicePendingIntent)
+            .addAction(R.drawable.ic_directions_bike_color_primary_24dp, "Turn off drive mode", stopServicePendingIntent)
             .build()
 
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
