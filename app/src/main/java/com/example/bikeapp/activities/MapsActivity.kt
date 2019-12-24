@@ -48,11 +48,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         super.onCreate(savedInstanceState)
         Log.d("lifecycle", "onCreate")
         val myPrefs = getSharedPreferences(Constants.sharedPrefsName, Context.MODE_PRIVATE)
-        if(!myPrefs.contains("notFirst")) {
-            startActivity(Intent(this, SplashScreenActivity::class.java))
-            finish()
-            return
-        }else if(!myPrefs.contains(User.name)){
+        if(!myPrefs.contains(User.name)){
             startActivity(Intent(this, RegisterActivity::class.java))
             finish()
             return
@@ -117,7 +113,9 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
     }
 
     override fun onDestroy() {
-        LocalBroadcastManager.getInstance(this).unregisterReceiver(receiver)
+        if(::receiver.isInitialized){
+            LocalBroadcastManager.getInstance(this).unregisterReceiver(receiver)
+        }
         super.onDestroy()
     }
 
