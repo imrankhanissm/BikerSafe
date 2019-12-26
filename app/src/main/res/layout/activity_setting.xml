@@ -78,7 +78,36 @@
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         android:text="Add emergency contact"
-        style="@style/buttonStyle"
-        />
+        style="@style/buttonStyle"/>
+
+    <TextView
+        android:id="@+id/accelerationThresholdSettingLabel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Acceleration threshold:  "
+        app:layout_constraintTop_toBottomOf="@id/addMoreEmergencyContactsProfile"
+        app:layout_constraintLeft_toLeftOf="parent"
+        android:layout_marginLeft="8dp"
+        android:layout_marginTop="8dp"/>
+
+    <TextView
+        android:id="@+id/accelerationThresholdSetting"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintLeft_toRightOf="@id/accelerationThresholdSettingLabel"
+        app:layout_constraintTop_toBottomOf="@id/addMoreEmergencyContactsProfile"
+        android:text="9.8G"
+        android:layout_marginTop="8dp"/>
+
+    <SeekBar
+        android:id="@+id/accelerationSeekBarSetting"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@id/accelerationThresholdSetting"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        android:layout_margin="8dp"
+        android:min="9"
+        android:max="78"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

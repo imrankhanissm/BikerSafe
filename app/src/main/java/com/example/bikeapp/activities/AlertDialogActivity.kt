@@ -22,7 +22,7 @@ class AlertDialogActivity : AppCompatActivity() {
         }
 
         override fun onTick(millisUntilFinished: Long) {
-            secondsAlertDialog.text = (millisUntilFinished/1000).toString() + "seconds"
+            secondsAlertDialog.text = (millisUntilFinished/1000).toString() + " seconds"
         }
     }
 

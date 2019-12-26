@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.util.Log
 import android.view.View
 import android.widget.EditText
+import android.widget.SeekBar
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
@@ -15,6 +16,7 @@ import com.example.bikeapp.R
 import com.example.bikeapp.dbHelper.DBHelper
 import com.example.bikeapp.models.Contact
 import com.example.bikeapp.models.User
+import com.example.bikeapp.services.SensorService
 import kotlinx.android.synthetic.main.activity_setting.*
 
 class SettingActivity : AppCompatActivity() {
@@ -100,6 +102,26 @@ class SettingActivity : AppCompatActivity() {
             }
             dialogBuilder.show()
         }
+
+        var accelerationThreshold = myPrefs.getFloat(Constants.accelerationThreshold, Constants.accelerationThresholdDefault)
+        accelerationThresholdSetting.text = accelerationThreshold.toString() + "G"
+        accelerationSeekBarSetting.progress = accelerationThreshold.toInt()
+
+        accelerationSeekBarSetting.setOnSeekBarChangeListener(object: SeekBar.OnSeekBarChangeListener{
+            override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
+                accelerationThresholdSetting.text = progress.toString() + "G"
+            }
+
+            override fun onStartTrackingTouch(seekBar: SeekBar?) {
+            }
+
+            override fun onStopTrackingTouch(seekBar: SeekBar?) {
+                if (seekBar != null) {
+                    myPrefs.edit().putFloat(Constants.accelerationThreshold, seekBar.progress.toFloat()).apply()
+                    SensorService.accelerationThreshold = seekBar.progress.toFloat()
+                }
+            }
+        })
     }
 
     private fun generateContactView(contact: Contact): View {

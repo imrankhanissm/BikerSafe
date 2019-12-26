@@ -30,6 +30,8 @@ class SensorService : Service(), SensorEventListener {
     companion object{
         var alertActive = false
         var serviceActive = false
+        var accelerationThreshold: Float = 12F // 78
+        var gyroscopeThreshold: Float = 12F // 17
     }
 
     private lateinit var sensorManager: SensorManager
@@ -38,8 +40,6 @@ class SensorService : Service(), SensorEventListener {
     private lateinit var locationCallback: LocationCallback
     private var lastLocation: Location? = null
 
-    private val accelerationThreshold: Float = 12F // 78
-    private val gyroscopeThreshold: Float = 12F // 17
     private var accelerometerArray: FloatArray = floatArrayOf(0F, 0F, 0F)
     private var gyroscopeArray: FloatArray = floatArrayOf(0F, 0F, 0F)
     private var maxGyroValue: Float = 0F
@@ -64,6 +64,7 @@ class SensorService : Service(), SensorEventListener {
                 sendLocationToUI()
             }
         }
+        accelerationThreshold = getSharedPreferences(Constants.sharedPrefsName, Context.MODE_PRIVATE).getFloat(Constants.accelerationThreshold, accelerationThreshold)
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {

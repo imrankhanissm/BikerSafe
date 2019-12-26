@@ -53,6 +53,8 @@ class RegisterActivity : AppCompatActivity() {
                 try {
                     prefEditor.putString(User.name, usernameRegister.text.toString())
                     prefEditor.putString(User.bloodGroup, bloodGroupRegister.text.toString())
+                    prefEditor.putFloat(Constants.accelerationThreshold, Constants.accelerationThresholdDefault)
+                    prefEditor.putFloat(Constants.gyroscopeThreshold, Constants.gyroscopeThresholdDefault)
 
 
                     for(i in 0 until emergencyContactListRegister.childCount){
