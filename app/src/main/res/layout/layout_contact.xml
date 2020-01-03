@@ -2,7 +2,8 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="horizontal" android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:paddingVertical="8dp">
+    android:paddingVertical="16dp"
+    android:background="?android:attr/selectableItemBackground">
         <TextView
             android:id="@+id/countryCodeProfile"
             android:layout_width="wrap_content"
@@ -14,5 +15,6 @@
             android:id="@+id/phoneNoProfile"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="phone number"/>
+            android:text="phone number"
+            android:drawableEnd="@drawable/ic_edit_color_primary_24dp"/>
 </LinearLayout>

@@ -7,6 +7,8 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.content.pm.PackageManager
 import android.content.res.ColorStateList
+import android.graphics.Bitmap
+import android.graphics.Canvas
 import android.graphics.Color
 import android.location.LocationManager
 import android.os.Bundle
@@ -28,6 +30,7 @@ import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
+import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.CircleOptions
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
@@ -67,11 +70,9 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
                                     .setPositiveButton("Send"){ _, _ ->
                                         sendAlert()
                                         alertDialog.dismiss()
-                                        Toast.makeText(this, "alert sent", Toast.LENGTH_SHORT).show()
                                     }
                                     .setNegativeButton("Cancel"){ _, _ ->
                                         alertDialog.dismiss()
-                                        Toast.makeText(this, "alert canceled", Toast.LENGTH_SHORT).show()
                                     }
                                     .create()
 
@@ -122,8 +123,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
-        val inflater = MenuInflater(this)
-        inflater.inflate(R.menu.maps_menu, menu)
+        menuInflater.inflate(R.menu.maps_menu, menu)
         return super.onCreateOptionsMenu(menu)
     }
 
@@ -195,7 +195,6 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
 
     override fun onMapReady(googleMap: GoogleMap) {
         mMap = googleMap
-//        mMap.isMyLocationEnabled = true
     }
 
     private fun setMarkerAndCircle(latitude: Double, longitude: Double, accuracy: Float){
@@ -212,8 +211,21 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
             radius(accuracy.toDouble()).
             strokeColor(getColor(R.color.colorPrimary)).
             strokeWidth(2F).
-            fillColor(Color.argb(50, Color.red(getColor(R.color.colorPrimary)), Color.green(getColor(R.color.colorPrimary)), Color.blue(getColor(R.color.colorPrimary)))))
-        mMap.addMarker(MarkerOptions().position(locLatLng))
+            fillColor(Color.argb(50, Color.red(getColor(R.color.colorPrimary)), Color.green(getColor(R.color.colorPrimary)), Color.blue(getColor(R.color.colorPrimary))))
+        )
+
+        var width = 42
+        var height = 42
+        var icon = getDrawable(R.drawable.ic_custom_location_marker_color_primary_24dp)
+        icon!!.setBounds(0, 0, width, height)
+        var bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
+        icon.draw(Canvas(bitmap))
+
+        mMap.addMarker(MarkerOptions().
+            icon(BitmapDescriptorFactory.fromBitmap(bitmap)).
+            position(locLatLng).
+            anchor(0.5f, 0.5f)
+        )
         mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(locLatLng, zoomLevel.toFloat()))
     }
 }

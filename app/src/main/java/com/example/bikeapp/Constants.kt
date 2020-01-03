@@ -10,4 +10,7 @@ object Constants {
     const val gyroscopeThreshold = "gyroscopeThreshold"
     const val gyroscopeThresholdDefault = 12F
     const val PENDING_INTENT_REQUEST_CODE_MAPS_ACTIVITY = 1
+    object NotificationChannels {
+        const val channel1 = "channel1"
+    }
 }

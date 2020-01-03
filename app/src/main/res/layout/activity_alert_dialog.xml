@@ -4,48 +4,50 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    tools:context=".activities.AlertDialogActivity"
-    android:padding="16dp">
+    android:padding="8dp"
+    tools:context=".activities.AlertDialogActivity">
 
     <TextView
         android:id="@+id/messageAlertDialog"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginLeft="16dp"
+        android:layout_marginTop="8dp"
         android:text="Collision detected sending alert in "
+        android:textColor="@android:color/black"
         android:textSize="16sp"
-        android:layout_marginLeft="8dp"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"/>
+        app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
         android:id="@+id/secondsAlertDialog"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
         android:text="0 seconds"
         android:textSize="16sp"
+        android:textColor="@android:color/black"
         app:layout_constraintLeft_toRightOf="@id/messageAlertDialog"
-        app:layout_constraintTop_toTopOf="parent"/>
+        app:layout_constraintTop_toTopOf="parent" />
 
     <Button
         android:id="@+id/cancel"
+        style="@style/Widget.AppCompat.Button.ButtonBar.AlertDialog"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginTop="24dp"
         android:text="cancel"
-        style="@style/buttonStyle"
         app:layout_constraintEnd_toStartOf="@+id/sendNow"
-        app:layout_constraintHorizontal_bias="0.745"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/messageAlertDialog"
-        android:layout_marginTop="16dp"/>
+        app:layout_constraintTop_toBottomOf="@+id/messageAlertDialog" />
 
     <Button
         android:id="@+id/sendNow"
+        style="@style/Widget.AppCompat.Button.ButtonBar.AlertDialog"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginTop="24dp"
         android:text="Send now"
-        style="@style/buttonStyle"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/messageAlertDialog"
-        android:layout_marginTop="16dp" />
+        app:layout_constraintTop_toBottomOf="@+id/messageAlertDialog" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

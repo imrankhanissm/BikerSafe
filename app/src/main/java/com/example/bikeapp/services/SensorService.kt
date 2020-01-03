@@ -82,8 +82,7 @@ class SensorService : Service(), SensorEventListener {
         val stopServicePendingIntent = PendingIntent.getService(this, 0, stopServiceIntent, PendingIntent.FLAG_CANCEL_CURRENT)
 
         val notMng = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-        val channelId = "ch1"
-        val not = NotificationCompat.Builder(this, channelId).setContentTitle("Biker App")
+        val not = NotificationCompat.Builder(this, Constants.NotificationChannels.channel1).setContentTitle("Biker App")
             .setContentText("Drive Mode On")
             .setColor(getColor(R.color.colorPrimary))
             .setSmallIcon(R.drawable.ic_directions_bike_color_primary_24dp)
@@ -92,7 +91,7 @@ class SensorService : Service(), SensorEventListener {
             .build()
 
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
-            val notChannel = NotificationChannel(channelId, "channel1", NotificationManager.IMPORTANCE_HIGH)
+            val notChannel = NotificationChannel(Constants.NotificationChannels.channel1, Constants.NotificationChannels.channel1, NotificationManager.IMPORTANCE_HIGH)
             notMng.createNotificationChannel(notChannel)
         }
         notMng.notify(1, not)
