@@ -22,7 +22,7 @@
             android:id="@+id/usernameProfile"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:drawableRight="@drawable/ic_edit_black_24dp"
+            android:drawableRight="@drawable/ic_edit_gray_24dp"
             android:text="Username"
             android:textSize="20sp"
             android:textFontWeight="700"/>
@@ -45,7 +45,7 @@
             android:id="@+id/bloodGroupProfile"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:drawableRight="@drawable/ic_edit_black_24dp"
+            android:drawableRight="@drawable/ic_edit_gray_24dp"
             android:text="Blood Group"
             android:textSize="20sp"/>
     </LinearLayout>

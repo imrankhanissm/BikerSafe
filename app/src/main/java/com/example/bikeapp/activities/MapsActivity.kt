@@ -6,6 +6,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.content.pm.PackageManager
+import android.content.res.ColorStateList
 import android.graphics.Color
 import android.location.LocationManager
 import android.os.Bundle
@@ -79,7 +80,8 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
             override fun onReceive(context: Context?, intent: Intent?) {
                 Log.d("intent", intent?.action)
                 if(intent?.action == Constants.serviceStopped){
-                    myLocFloatingActionButton.setImageResource(R.drawable.ic_directions_bike_black_24dp)
+//                    myLocFloatingActionButton.setImageResource(R.drawable.ic_directions_bike_gray_24dp)
+                    toggleFloatingActionButton(false)
                     mMap.clear()
                 }else{
                     val latitude = intent?.extras?.get("latitude") as Double
@@ -106,9 +108,9 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         super.onResume()
         Log.d("lifecycle", "onResume")
         if(SensorService.serviceActive){
-            myLocFloatingActionButton.setImageResource(R.drawable.ic_directions_bike_color_primary_24dp)
+            toggleFloatingActionButton(true)
         }else{
-            myLocFloatingActionButton.setImageResource(R.drawable.ic_directions_bike_black_24dp)
+            toggleFloatingActionButton(false)
         }
     }
 
@@ -146,7 +148,8 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
             ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.SEND_SMS, Manifest.permission.READ_PHONE_STATE), locationPermissionCode)
         }else{
             if(locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)){
-                myLocFloatingActionButton.setImageResource(R.drawable.ic_directions_bike_color_primary_24dp)
+//                myLocFloatingActionButton.setImageResource(R.drawable.ic_directions_bike_color_primary_24dp)
+                toggleFloatingActionButton(true)
                 // start service
                 val intent = Intent(this, SensorService::class.java)
                 ContextCompat.startForegroundService(this, intent)
@@ -158,10 +161,21 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
     }
 
     private fun driveModeOff() {
-        myLocFloatingActionButton.setImageResource(R.drawable.ic_directions_bike_black_24dp)
+//        myLocFloatingActionButton.setImageResource(R.drawable.ic_directions_bike_gray_24dp)
+        toggleFloatingActionButton(false)
         mMap.clear()
         val intent = Intent(this, SensorService::class.java)
         stopService(intent)
+    }
+
+    private fun toggleFloatingActionButton(switch: Boolean){
+        if(switch){
+            myLocFloatingActionButton.setImageResource(R.drawable.ic_directions_bike_white_24dp)
+            myLocFloatingActionButton.backgroundTintList = ColorStateList.valueOf(getColor(R.color.colorPrimary))
+        }else{
+            myLocFloatingActionButton.setImageResource(R.drawable.ic_directions_bike_gray_24dp)
+            myLocFloatingActionButton.backgroundTintList = ColorStateList.valueOf(getColor(R.color.white))
+        }
     }
 
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
