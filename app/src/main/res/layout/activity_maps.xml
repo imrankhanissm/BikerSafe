@@ -36,6 +36,7 @@
         app:borderWidth="0dp"
         app:layout_constraintBottom_toTopOf="@+id/help"
         app:layout_constraintRight_toRightOf="parent"
+        android:backgroundTint="@color/white"
         app:srcCompat="@drawable/ic_directions_bike_gray_24dp" />
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton

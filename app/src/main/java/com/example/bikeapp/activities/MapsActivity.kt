@@ -170,11 +170,11 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
 
     private fun toggleFloatingActionButton(switch: Boolean){
         if(switch){
-            myLocFloatingActionButton.setImageResource(R.drawable.ic_directions_bike_white_24dp)
-            myLocFloatingActionButton.backgroundTintList = ColorStateList.valueOf(getColor(R.color.colorPrimary))
+            myLocFloatingActionButton.setImageResource(R.drawable.ic_directions_bike_color_primary_24dp)
+//            myLocFloatingActionButton.backgroundTintList = ColorStateList.valueOf(getColor(R.color.colorPrimary))
         }else{
             myLocFloatingActionButton.setImageResource(R.drawable.ic_directions_bike_gray_24dp)
-            myLocFloatingActionButton.backgroundTintList = ColorStateList.valueOf(getColor(R.color.white))
+//            myLocFloatingActionButton.backgroundTintList = ColorStateList.valueOf(getColor(R.color.white))
         }
     }
 
