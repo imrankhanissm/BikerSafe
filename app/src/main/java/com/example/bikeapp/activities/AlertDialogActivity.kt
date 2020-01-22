@@ -1,5 +1,6 @@
 package com.example.bikeapp.activities
 
+import android.location.Location
 import android.os.Bundle
 import android.os.CountDownTimer
 import android.telephony.SmsManager
@@ -46,8 +47,12 @@ class AlertDialogActivity : AppCompatActivity() {
     private fun sendAlert(){
         var dest = "+918341483786"
         var msg = "alert test"
-//        SmsService.sendSms(dest, msg)
+        var latitude = intent.extras!!["latitude"] as Double
+        var longitude = intent.extras!!["longitude"] as Double
+        var location = Location("")
+        location.latitude = latitude
+        location.longitude = longitude
+        SmsService(this).sendAlertToAll(location)
         Toast.makeText(applicationContext, "Alert sent", Toast.LENGTH_SHORT).show()
-
     }
 }

@@ -7,4 +7,11 @@ class Contact(countryCode: String, phoneNo: String) {
     }
     var countryCode: String = countryCode
     var phoneNo: String = phoneNo
+
+    fun isValid(): Boolean{
+        if(phoneNo.length == 10 && countryCode == "+91"){
+            return true
+        }
+        return false
+    }
 }

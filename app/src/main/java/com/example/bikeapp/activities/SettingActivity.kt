@@ -32,7 +32,6 @@ class SettingActivity : AppCompatActivity() {
         supportActionBar?.title = "Setting"
         myPrefs = getSharedPreferences(Constants.sharedPrefsName, Context.MODE_PRIVATE)
         usernameProfile.text = myPrefs.getString(User.name, null)
-        bloodGroupProfile.setText(myPrefs.getString(User.bloodGroup, null))
 
         usernameProfileContainer.setOnClickListener {
             val dialogBuilder = AlertDialog.Builder(this)
@@ -49,26 +48,6 @@ class SettingActivity : AppCompatActivity() {
 
                 myPrefs.edit().putString(User.name, newName).apply()
                 usernameProfile.text = newName
-            }
-            dialogBuilder.show()
-        }
-
-        bloodGroupProfileContainer.setOnClickListener {
-            val dialogBuilder = AlertDialog.Builder(this)
-            val dialogView = layoutInflater.inflate(R.layout.dialog_edit_name, null)
-            dialogView.findViewById<EditText>(R.id.mapsMenuProfileEdit)?.setText(bloodGroupProfile.text)
-            dialogBuilder.setView(dialogView)
-            dialogBuilder.setTitle("Edit Blood Group")
-            dialogBuilder.setNegativeButton("cancel") { dialog, _ ->
-                dialog.dismiss()
-            }
-            dialogBuilder.setPositiveButton("save") { dialog, _ ->
-                val newName = (dialog as AlertDialog).findViewById<EditText>(R.id.mapsMenuProfileEdit)?.text.toString()
-                Log.d("debug", newName)
-
-                myPrefs.edit().putString(User.bloodGroup, newName).apply()
-                bloodGroupProfile.text = newName
-
             }
             dialogBuilder.show()
         }

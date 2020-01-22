@@ -27,6 +27,7 @@
                     android:textColor="@color/black"
                     android:drawableEnd="@drawable/ic_edit_gray_24dp"/>
         </LinearLayout>
+
         <View
             android:layout_width="match_parent"
             android:layout_height="1px"

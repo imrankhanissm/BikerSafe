@@ -42,44 +42,6 @@
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"/>
 
-    <LinearLayout
-        android:id="@+id/bloodGroupProfileContainer"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:clickable="true"
-        android:focusable="true"
-        android:orientation="vertical"
-        android:padding="8dp"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/usernameProfileContainer"
-        android:background="?android:attr/selectableItemBackground">
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Blood Group" />
-
-        <TextView
-            android:id="@+id/bloodGroupProfile"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:drawableEnd="@drawable/ic_edit_gray_24dp"
-            android:text="Blood Group"
-            android:textColor="@color/black"
-            android:paddingTop="8dp"
-            android:paddingBottom="16dp"
-            android:textSize="20sp" />
-    </LinearLayout>
-
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="1px"
-        android:background="@color/lightGray"
-        app:layout_constraintTop_toBottomOf="@id/bloodGroupProfileContainer"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"/>
-
     <TextView
         android:id="@+id/emergencyContactListProfileLabel"
         android:layout_width="match_parent"
@@ -87,7 +49,7 @@
         android:text="Emergency contact list"
         android:layout_marginLeft="8dp"
         android:layout_marginTop="8dp"
-        app:layout_constraintTop_toBottomOf="@id/bloodGroupProfileContainer"
+        app:layout_constraintTop_toBottomOf="@id/usernameProfileContainer"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"/>
 

@@ -3,12 +3,12 @@ package com.example.bikeapp.services
 import android.content.Context
 import android.location.Location
 import android.telephony.SmsManager
+import android.widget.Toast
 import com.example.bikeapp.dbHelper.DBHelper
 import com.example.bikeapp.models.Contact
 
 class SmsService {
-
-    private var message = "Alert test"
+    private var message = "Test Accident alert\n"
     private var mapsLink = "https://www.google.com/maps/search/?api=1&query="
     private var smsManager: SmsManager = SmsManager.getDefault()
     private var dbHelper: DBHelper
@@ -21,7 +21,9 @@ class SmsService {
         val contacts = dbHelper.getContacts()
         if (contacts != null) {
             for(i in contacts){
-                sendSms(i, location)
+                if(i.isValid()){
+                    sendSms(i, location)
+                }
             }
         }
     }

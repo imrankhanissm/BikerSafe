@@ -194,6 +194,8 @@ class SensorService : Service(), SensorEventListener {
         val intent = Intent(this, AlertDialogActivity::class.java)
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
         intent.addFlags(Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS)
+        intent.putExtra("latitude", lastLocation?.latitude)
+        intent.putExtra("longitude", lastLocation?.longitude)
         startActivity(intent)
     }
 

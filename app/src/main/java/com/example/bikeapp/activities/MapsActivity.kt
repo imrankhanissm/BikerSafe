@@ -6,15 +6,14 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.content.pm.PackageManager
-import android.content.res.ColorStateList
 import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.graphics.Color
+import android.location.Location
 import android.location.LocationManager
 import android.os.Bundle
 import android.util.Log
 import android.view.Menu
-import android.view.MenuInflater
 import android.view.MenuItem
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
@@ -26,6 +25,7 @@ import com.example.bikeapp.Constants
 import com.example.bikeapp.R
 import com.example.bikeapp.models.User
 import com.example.bikeapp.services.SensorService
+import com.example.bikeapp.services.SmsService
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
@@ -46,6 +46,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
     private lateinit var receiver: BroadcastReceiver
     private lateinit var locationManager: LocationManager
     private lateinit var alertDialog: AlertDialog
+    private var lastLocation: Location? = null
     private var snackBar: Snackbar? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -88,6 +89,11 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
                     val latitude = intent?.extras?.get("latitude") as Double
                     val longitude = intent.extras?.get("longitude") as Double
                     val accuracy = intent.extras?.get("accuracy") as Float
+                    if(lastLocation == null){
+                        lastLocation = Location("")
+                    }
+                    lastLocation?.latitude = latitude
+                    lastLocation?.longitude = longitude
                     setMarkerAndCircle(latitude, longitude, accuracy)
                 }
             }
@@ -188,11 +194,6 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
 //        }
     }
 
-    private fun sendAlert(){
-//        SmsService(this).sendAlertToAll()
-        Toast.makeText(this, "Alert sent from activity", Toast.LENGTH_SHORT).show()
-    }
-
     override fun onMapReady(googleMap: GoogleMap) {
         mMap = googleMap
     }
@@ -227,5 +228,10 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
             anchor(0.5f, 0.5f)
         )
         mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(locLatLng, zoomLevel.toFloat()))
+    }
+
+    private fun sendAlert(){
+        lastLocation?.let { SmsService(this).sendAlertToAll(it) }
+        Toast.makeText(this, "Alert sent from activity", Toast.LENGTH_SHORT).show()
     }
 }
