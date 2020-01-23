@@ -16,6 +16,7 @@ import android.os.IBinder
 import android.os.Looper
 import android.util.Log
 import androidx.core.app.NotificationCompat
+import androidx.core.content.ContextCompat
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.example.bikeapp.Constants
 import com.example.bikeapp.R
@@ -84,7 +85,7 @@ class SensorService : Service(), SensorEventListener {
         val notMng = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         val not = NotificationCompat.Builder(this, Constants.NotificationChannels.channel1).setContentTitle("Biker App")
             .setContentText("Drive Mode On")
-            .setColor(getColor(R.color.colorPrimary))
+            .setColor(ContextCompat.getColor(this, R.color.colorPrimary))
             .setSmallIcon(R.drawable.ic_directions_bike_color_primary_24dp)
             .setContentIntent(pendingIntent)
             .addAction(R.drawable.ic_directions_bike_color_primary_24dp, "Turn off drive mode", stopServicePendingIntent)
@@ -193,7 +194,6 @@ class SensorService : Service(), SensorEventListener {
         Log.d("debug", "Collision detected")
         val intent = Intent(this, AlertDialogActivity::class.java)
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-        intent.addFlags(Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS)
         intent.putExtra("latitude", lastLocation?.latitude)
         intent.putExtra("longitude", lastLocation?.longitude)
         startActivity(intent)

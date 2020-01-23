@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="horizontal" android:layout_width="match_parent"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="horizontal"
+    android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:padding="16dp">
 
@@ -9,12 +11,28 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="+91"
-        android:inputType="phone"/>
+        android:inputType="phone"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toTopOf="parent"/>
 
     <EditText
         android:id="@+id/phoneNoAddContactProfile"
-        android:layout_width="match_parent"
+        android:layout_width="0px"
         android:layout_height="wrap_content"
         android:inputType="phone"
-        android:importantForAutofill="no"/>
-</LinearLayout>
+        android:importantForAutofill="no"
+        app:layout_constraintLeft_toRightOf="@id/countryCodeAddContactProfile"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:paddingRight="30dp"/>
+
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/contactsButton"
+        android:src="@drawable/ic_contacts_gray_24dp"
+        android:padding="6dp"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        style="@style/Widget.AppCompat.Toolbar.Button.Navigation"/>
+</androidx.constraintlayout.widget.ConstraintLayout>

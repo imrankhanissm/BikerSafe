@@ -6,6 +6,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.content.pm.PackageManager
+import android.content.res.ColorStateList
 import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.graphics.Color
@@ -40,7 +41,6 @@ import kotlinx.android.synthetic.main.activity_maps.*
 class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
 
     private val locationPermissionCode = 1
-    private val sendSmsPermissionCode = 2
 
     private lateinit var mMap: GoogleMap
     private lateinit var receiver: BroadcastReceiver
@@ -104,7 +104,11 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         }
 
         help.setOnClickListener {
-            alertDialog.show()
+            if(SensorService.serviceActive){
+                alertDialog.show()
+            }else{
+                Toast.makeText(this, "First turn on drive mode", Toast.LENGTH_SHORT).show()
+            }
         }
         LocalBroadcastManager.getInstance(this).registerReceiver(receiver, IntentFilter(Constants.locationFromService))
         LocalBroadcastManager.getInstance(this).registerReceiver(receiver, IntentFilter((Constants.serviceStopped)))
@@ -210,16 +214,16 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         mMap.addCircle(CircleOptions().
             center(locLatLng).
             radius(accuracy.toDouble()).
-            strokeColor(getColor(R.color.colorPrimary)).
+            strokeColor(ContextCompat.getColor(this, R.color.colorPrimary)).
             strokeWidth(2F).
-            fillColor(Color.argb(50, Color.red(getColor(R.color.colorPrimary)), Color.green(getColor(R.color.colorPrimary)), Color.blue(getColor(R.color.colorPrimary))))
+            fillColor(Color.argb(50, Color.red(ContextCompat.getColor(this, R.color.colorPrimary)), Color.green(ContextCompat.getColor(this, R.color.colorPrimary)), Color.blue(ContextCompat.getColor(this, R.color.colorPrimary))))
         )
 
-        var width = 42
-        var height = 42
-        var icon = getDrawable(R.drawable.ic_custom_location_marker_color_primary_24dp)
+        val width = 42
+        val height = 42
+        val icon = getDrawable(R.drawable.ic_custom_location_marker_color_primary_24dp)
         icon!!.setBounds(0, 0, width, height)
-        var bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
+        val bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
         icon.draw(Canvas(bitmap))
 
         mMap.addMarker(MarkerOptions().

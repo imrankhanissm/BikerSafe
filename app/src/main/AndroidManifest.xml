@@ -12,6 +12,7 @@
     <uses-permission android:name="android.permission.SEND_SMS" />
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.READ_CONTACTS"/>
 
     <uses-feature
         android:name="hardware.sensor.accelerometer"
@@ -27,7 +28,7 @@
         android:theme="@style/AppTheme">
         <activity
             android:name=".activities.AlertDialogActivity"
-            android:theme="@style/AlertDialogAppTheme"></activity>
+            android:theme="@style/AlertDialogAppTheme" android:launchMode="singleTask" />
 
         <service
             android:name=".services.SensorService"

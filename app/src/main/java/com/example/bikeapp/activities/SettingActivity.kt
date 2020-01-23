@@ -1,14 +1,13 @@
 package com.example.bikeapp.activities
 
 import android.content.Context
+import android.content.Intent
 import android.content.SharedPreferences
 import android.os.Bundle
+import android.provider.ContactsContract
 import android.util.Log
 import android.view.View
-import android.widget.EditText
-import android.widget.SeekBar
-import android.widget.TextView
-import android.widget.Toast
+import android.widget.*
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import com.example.bikeapp.Constants
@@ -23,6 +22,8 @@ class SettingActivity : AppCompatActivity() {
 
     private lateinit var myPrefs: SharedPreferences
     private lateinit var dbHelper: DBHelper
+    private val RESULT_PICK_CONTACT = 1
+    private lateinit var dialogView: View
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -64,7 +65,11 @@ class SettingActivity : AppCompatActivity() {
 
         addMoreEmergencyContactsProfile.setOnClickListener {
             val dialogBuilder = AlertDialog.Builder(this)
-            val dialogView = layoutInflater.inflate(R.layout.dialog_add_contact, null)
+            dialogView = layoutInflater.inflate(R.layout.dialog_add_contact, null)
+            dialogView.findViewById<ImageView>(R.id.contactsButton).setOnClickListener {
+                var contactsIntent = Intent(Intent.ACTION_PICK, ContactsContract.CommonDataKinds.Phone.CONTENT_URI)
+                startActivityForResult(contactsIntent, RESULT_PICK_CONTACT)
+            }
             dialogBuilder.setView(dialogView)
             dialogBuilder.setTitle("Add Contact")
             dialogBuilder.setNegativeButton("cancel") { dialog, _ ->
@@ -109,9 +114,14 @@ class SettingActivity : AppCompatActivity() {
         contactView.findViewById<TextView>(R.id.phoneNoProfile).text = contact.phoneNo
         contactView.setOnClickListener {
             val dialogBuilder = AlertDialog.Builder(this)
-            val dialogView = layoutInflater.inflate(R.layout.dialog_add_contact, null)
+            dialogView = layoutInflater.inflate(R.layout.dialog_add_contact, null)
             dialogView.findViewById<EditText>(R.id.countryCodeAddContactProfile)?.setText(contactView.findViewById<TextView>(R.id.countryCodeProfile).text)
             dialogView.findViewById<EditText>(R.id.phoneNoAddContactProfile)?.setText(contactView.findViewById<TextView>(R.id.phoneNoProfile).text)
+            dialogView.findViewById<ImageView>(R.id.contactsButton).setOnClickListener {
+                var contactsIntent = Intent(Intent.ACTION_PICK, ContactsContract.CommonDataKinds.Phone.CONTENT_URI)
+                startActivityForResult(contactsIntent, RESULT_PICK_CONTACT)
+            }
+
             dialogBuilder.setView(dialogView)
             dialogBuilder.setTitle("Edit Contact")
             dialogBuilder.setNegativeButton("cancel") { dialog, _ ->
@@ -137,12 +147,42 @@ class SettingActivity : AppCompatActivity() {
                         emergencyContactListProfile.removeView(contactView)
                     }
                 }else{
-                    Toast.makeText(this, "Atleast one emergency contact required", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this, "At least one emergency contact required", Toast.LENGTH_SHORT).show()
                 }
             }
             dialogBuilder.show()
         }
         return contactView
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if(requestCode == RESULT_PICK_CONTACT){
+            try {
+                var uri = data?.data
+                var cursor = contentResolver.query(uri, null, null, null, null)
+                cursor.moveToFirst()
+                var nameIndex = cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME)
+                var phoneIndex = cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER)
+                var contactName = cursor.getString(nameIndex)
+                var contactNumber = cursor.getString(phoneIndex)
+                var cleanedContactNumber = ""
+                for (i in contactNumber.length-1 downTo 0){
+                    if(contactNumber[i].isDigit()){
+                        cleanedContactNumber = contactNumber[i] + cleanedContactNumber
+                        if(cleanedContactNumber.length == 10){
+                            break
+                        }
+                    }
+                }
+                if(dialogView.isShown){
+                    dialogView.findViewById<EditText>(R.id.phoneNoAddContactProfile).setText(cleanedContactNumber)
+                }
+                Log.d("debug", "$contactName -> $cleanedContactNumber")
+            }catch (exception: Exception){
+                Log.d("debug", "Exception while picking contact: " + exception.message)
+            }
+        }
     }
 
     override fun onSupportNavigateUp(): Boolean {
