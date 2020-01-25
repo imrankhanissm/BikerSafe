@@ -1,4 +1,19 @@
 <resources>
     <string name="app_name">bikerApp</string>
     <string name="title_activity_maps">Map</string>
+    <string name="sound_on_collision">Sound on collision</string>
+    <string name="vibrate_on_collision">Vibrate on collision</string>
+    <string name="_9_8g">9.8G</string>
+    <string name="acceleration_threshold">Acceleration threshold:</string>
+    <string name="add_emergency_contact">Add emergency contact</string>
+    <string name="emergency_contact_list">Emergency contact list</string>
+    <string name="username">Username</string>
+    <string name="name">Name</string>
+    <string name="collision_detected_sending_alert_in">Collision detected sending alert in</string>
+    <string name="_0_seconds">0 seconds</string>
+    <string name="cancel">cancel</string>
+    <string name="send_now">Send now</string>
+    <string name="register">Register</string>
+    <string name="contacts">Contacts</string>
+    <string name="phone_number">phone number</string>
 </resources>

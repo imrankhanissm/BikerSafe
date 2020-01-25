@@ -10,10 +10,9 @@ import android.util.Log
 import android.widget.Toast
 import com.example.bikeapp.models.Contact
 
-class DBHelper(context: Context) :
+class DBHelper(private val context: Context) :
     SQLiteOpenHelper(context, DATABASE_NAME, null, DATABASE_VERSION) {
 
-    private val context = context
     companion object {
         private var DATABASE_NAME = "emergencyContacts"
         private var DATABASE_VERSION = 1
@@ -24,7 +23,7 @@ class DBHelper(context: Context) :
     override fun onCreate(db: SQLiteDatabase?) {
 //        , constraint unique_constraint unique(${Contact.countryCodeLable}, ${Contact.phoneNoLabel})
         val createTable =
-            "create table $EMERGENCY_CONTACTS_TABLE_NAME ($COLUMN_ID integer primary key autoincrement, ${Contact.countryCodeLable} text, ${Contact.phoneNoLabel} text)"
+            "create table $EMERGENCY_CONTACTS_TABLE_NAME ($COLUMN_ID integer primary key autoincrement, ${Contact.countryCodeLabel} text, ${Contact.phoneNoLabel} text)"
         db!!.execSQL(createTable)
     }
 
@@ -33,7 +32,7 @@ class DBHelper(context: Context) :
     fun getContacts(): List<Contact>? {
         val contacts = ArrayList<Contact>()
         val query = "select * from $EMERGENCY_CONTACTS_TABLE_NAME"
-        var cursor: Cursor?
+        val cursor: Cursor?
         val dbl = readableDatabase
         try {
             cursor = dbl?.rawQuery(query, null)
@@ -44,7 +43,7 @@ class DBHelper(context: Context) :
         }
         if (cursor!!.moveToFirst()) {
             do {
-                contacts.add(Contact(cursor.getString(cursor.getColumnIndex(Contact.countryCodeLable)), cursor.getString(cursor.getColumnIndex(Contact.phoneNoLabel))))
+                contacts.add(Contact(cursor.getString(cursor.getColumnIndex(Contact.countryCodeLabel)), cursor.getString(cursor.getColumnIndex(Contact.phoneNoLabel))))
             } while (cursor.moveToNext())
         }
         cursor.close()
@@ -54,7 +53,7 @@ class DBHelper(context: Context) :
 
     fun insertContact(contact: Contact): Boolean {
         val cv = ContentValues()
-        cv.put(Contact.countryCodeLable, contact.countryCode)
+        cv.put(Contact.countryCodeLabel, contact.countryCode)
         cv.put(Contact.phoneNoLabel, contact.phoneNo)
         val dbl = writableDatabase
         try {
@@ -75,11 +74,11 @@ class DBHelper(context: Context) :
 
     fun updateContact(oldContact: Contact, newContact: Contact): Boolean {
         val cv = ContentValues()
-        cv.put(Contact.countryCodeLable, newContact.countryCode)
+        cv.put(Contact.countryCodeLabel, newContact.countryCode)
         cv.put(Contact.phoneNoLabel, newContact.phoneNo)
         val dbl = writableDatabase
         try {
-            if (dbl.update(EMERGENCY_CONTACTS_TABLE_NAME, cv, Contact.countryCodeLable + " =? and " + Contact.phoneNoLabel + " =? ", arrayOf(oldContact.countryCode, oldContact.phoneNo)) > 0){
+            if (dbl.update(EMERGENCY_CONTACTS_TABLE_NAME, cv, Contact.countryCodeLabel + " =? and " + Contact.phoneNoLabel + " =? ", arrayOf(oldContact.countryCode, oldContact.phoneNo)) > 0){
                 dbl.close()
                 return true
             }else{
@@ -97,7 +96,7 @@ class DBHelper(context: Context) :
     fun deleteContact(contact: Contact): Boolean {
         val dbl = writableDatabase
         try {
-            if (dbl.delete(EMERGENCY_CONTACTS_TABLE_NAME, Contact.countryCodeLable + " =? and " + Contact.phoneNoLabel + " =? ", arrayOf(contact.countryCode, contact.phoneNo)) > 0) {
+            if (dbl.delete(EMERGENCY_CONTACTS_TABLE_NAME, Contact.countryCodeLabel + " =? and " + Contact.phoneNoLabel + " =? ", arrayOf(contact.countryCode, contact.phoneNo)) > 0) {
                 dbl.close()
                 return true
             }else{

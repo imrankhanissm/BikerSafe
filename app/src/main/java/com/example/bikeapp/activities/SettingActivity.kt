@@ -54,7 +54,7 @@ class SettingActivity : AppCompatActivity() {
         }
 
         dbHelper = DBHelper(this)
-        var contacts = dbHelper.getContacts()
+        val contacts = dbHelper.getContacts()
 
         if (contacts != null) {
             for (i in contacts){
@@ -67,7 +67,7 @@ class SettingActivity : AppCompatActivity() {
             val dialogBuilder = AlertDialog.Builder(this)
             dialogView = layoutInflater.inflate(R.layout.dialog_add_contact, null)
             dialogView.findViewById<ImageView>(R.id.contactsButton).setOnClickListener {
-                var contactsIntent = Intent(Intent.ACTION_PICK, ContactsContract.CommonDataKinds.Phone.CONTENT_URI)
+                val contactsIntent = Intent(Intent.ACTION_PICK, ContactsContract.CommonDataKinds.Phone.CONTENT_URI)
                 startActivityForResult(contactsIntent, RESULT_PICK_CONTACT)
             }
             dialogBuilder.setView(dialogView)
@@ -87,13 +87,13 @@ class SettingActivity : AppCompatActivity() {
             dialogBuilder.show()
         }
 
-        var accelerationThreshold = myPrefs.getFloat(Constants.accelerationThreshold, Constants.accelerationThresholdDefault)
-        accelerationThresholdSetting.text = accelerationThreshold.toString() + "G"
+        val accelerationThreshold = myPrefs.getFloat(Constants.Settings.accelerationThreshold, Constants.Settings.accelerationThresholdDefault)
+        accelerationThresholdSetting.text = String.format("%d G", accelerationThreshold.toInt())
         accelerationSeekBarSetting.progress = accelerationThreshold.toInt()
 
         accelerationSeekBarSetting.setOnSeekBarChangeListener(object: SeekBar.OnSeekBarChangeListener{
             override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
-                accelerationThresholdSetting.text = progress.toString() + "G"
+                accelerationThresholdSetting.text = String.format("%d G", progress)
             }
 
             override fun onStartTrackingTouch(seekBar: SeekBar?) {
@@ -101,11 +101,29 @@ class SettingActivity : AppCompatActivity() {
 
             override fun onStopTrackingTouch(seekBar: SeekBar?) {
                 if (seekBar != null) {
-                    myPrefs.edit().putFloat(Constants.accelerationThreshold, seekBar.progress.toFloat()).apply()
+                    myPrefs.edit().putFloat(Constants.Settings.accelerationThreshold, seekBar.progress.toFloat()).apply()
                     SensorService.accelerationThreshold = seekBar.progress.toFloat()
                 }
             }
         })
+
+        soundSwitch.isChecked = myPrefs.getBoolean(Constants.Settings.sound, true)
+        vibrateSwitch.isChecked = myPrefs.getBoolean(Constants.Settings.vibrate, true)
+        soundSwitch.setOnCheckedChangeListener { _, isChecked ->
+            if(isChecked){
+                myPrefs.edit().putBoolean(Constants.Settings.sound, true).apply()
+            }else{
+                myPrefs.edit().putBoolean(Constants.Settings.sound, false).apply()
+            }
+        }
+
+        vibrateSwitch.setOnCheckedChangeListener { _, isChecked ->
+            if(isChecked){
+                myPrefs.edit().putBoolean(Constants.Settings.vibrate, true).apply()
+            }else{
+                myPrefs.edit().putBoolean(Constants.Settings.vibrate, false).apply()
+            }
+        }
     }
 
     private fun generateContactView(contact: Contact): View {
@@ -118,7 +136,7 @@ class SettingActivity : AppCompatActivity() {
             dialogView.findViewById<EditText>(R.id.countryCodeAddContactProfile)?.setText(contactView.findViewById<TextView>(R.id.countryCodeProfile).text)
             dialogView.findViewById<EditText>(R.id.phoneNoAddContactProfile)?.setText(contactView.findViewById<TextView>(R.id.phoneNoProfile).text)
             dialogView.findViewById<ImageView>(R.id.contactsButton).setOnClickListener {
-                var contactsIntent = Intent(Intent.ACTION_PICK, ContactsContract.CommonDataKinds.Phone.CONTENT_URI)
+                val contactsIntent = Intent(Intent.ACTION_PICK, ContactsContract.CommonDataKinds.Phone.CONTENT_URI)
                 startActivityForResult(contactsIntent, RESULT_PICK_CONTACT)
             }
 
@@ -159,13 +177,13 @@ class SettingActivity : AppCompatActivity() {
         super.onActivityResult(requestCode, resultCode, data)
         if(requestCode == RESULT_PICK_CONTACT){
             try {
-                var uri = data?.data
-                var cursor = contentResolver.query(uri, null, null, null, null)
-                cursor.moveToFirst()
-                var nameIndex = cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME)
-                var phoneIndex = cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER)
-                var contactName = cursor.getString(nameIndex)
-                var contactNumber = cursor.getString(phoneIndex)
+                val uri = data?.data
+                val cursor = contentResolver.query(uri, null, null, null, null)
+                cursor!!.moveToFirst()
+                val nameIndex = cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME)
+                val phoneIndex = cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER)
+                val contactName = cursor.getString(nameIndex)
+                val contactNumber = cursor.getString(phoneIndex)
                 var cleanedContactNumber = ""
                 for (i in contactNumber.length-1 downTo 0){
                     if(contactNumber[i].isDigit()){

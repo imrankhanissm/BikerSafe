@@ -65,7 +65,7 @@ class SensorService : Service(), SensorEventListener {
                 sendLocationToUI()
             }
         }
-        accelerationThreshold = getSharedPreferences(Constants.sharedPrefsName, Context.MODE_PRIVATE).getFloat(Constants.accelerationThreshold, accelerationThreshold)
+        accelerationThreshold = getSharedPreferences(Constants.sharedPrefsName, Context.MODE_PRIVATE).getFloat(Constants.Settings.accelerationThreshold, accelerationThreshold)
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {

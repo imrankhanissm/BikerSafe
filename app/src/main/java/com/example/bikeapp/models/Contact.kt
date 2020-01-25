@@ -1,12 +1,10 @@
 package com.example.bikeapp.models
 
-class Contact(countryCode: String, phoneNo: String) {
+class Contact(var countryCode: String, var phoneNo: String) {
     companion object{
-        const val countryCodeLable = "countryCode"
+        const val countryCodeLabel = "countryCode"
         const val phoneNoLabel = "phoneNo"
     }
-    var countryCode: String = countryCode
-    var phoneNo: String = phoneNo
 
     fun isValid(): Boolean{
         if(phoneNo.length == 10 && countryCode == "+91"){

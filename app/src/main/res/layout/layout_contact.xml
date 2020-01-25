@@ -9,7 +9,8 @@
             android:orientation="horizontal"
             android:paddingTop="16dp"
             android:paddingBottom="16dp"
-            android:paddingLeft="8dp"
+            android:paddingStart="8dp"
+            android:paddingEnd="0dp"
             android:background="?android:attr/selectableItemBackground">
                 <TextView
                     android:id="@+id/countryCodeProfile"
@@ -23,7 +24,7 @@
                     android:id="@+id/phoneNoProfile"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="phone number"
+                    android:text="@string/phone_number"
                     android:textColor="@color/black"
                     android:drawableEnd="@drawable/ic_edit_gray_24dp"/>
         </LinearLayout>

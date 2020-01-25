@@ -4,7 +4,6 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.provider.ContactsContract
-import android.text.Editable
 import android.util.Log
 import android.view.View
 import android.view.inputmethod.InputMethodManager
@@ -31,7 +30,7 @@ class RegisterActivity : AppCompatActivity() {
             val dialogBuilder = AlertDialog.Builder(this)
             dialogView = layoutInflater.inflate(R.layout.dialog_add_contact, null)
             dialogView.findViewById<ImageView>(R.id.contactsButton).setOnClickListener {
-                var contactsIntent = Intent(Intent.ACTION_PICK, ContactsContract.CommonDataKinds.Phone.CONTENT_URI)
+                val contactsIntent = Intent(Intent.ACTION_PICK, ContactsContract.CommonDataKinds.Phone.CONTENT_URI)
                 startActivityForResult(contactsIntent, RESULT_PICK_CONTACT)
             }
             dialogBuilder.setView(dialogView)
@@ -70,8 +69,10 @@ class RegisterActivity : AppCompatActivity() {
             val prefEditor = myPrefs.edit()
             try {
                 prefEditor.putString(User.name, usernameRegister.text.toString())
-                prefEditor.putFloat(Constants.accelerationThreshold, Constants.accelerationThresholdDefault)
-                prefEditor.putFloat(Constants.gyroscopeThreshold, Constants.gyroscopeThresholdDefault)
+                prefEditor.putFloat(Constants.Settings.accelerationThreshold, Constants.Settings.accelerationThresholdDefault)
+                prefEditor.putFloat(Constants.Settings.gyroscopeThreshold, Constants.Settings.gyroscopeThresholdDefault)
+                prefEditor.putBoolean(Constants.Settings.sound, true)
+                prefEditor.putBoolean(Constants.Settings.vibrate, true)
 
 
                 for(i in 0 until emergencyContactListRegister.childCount){
@@ -86,12 +87,6 @@ class RegisterActivity : AppCompatActivity() {
                 prefEditor.apply()
                 startActivity(Intent(this, MapsActivity::class.java))
                 finish()
-//                val contacts = dbHelper.getContacts()
-//                if (contacts != null) {
-//                    for(i in contacts){
-//                        Log.d("debug", "emergency contact from database: $i")
-//                    }
-//                }
             }catch (e: Exception){
                 Toast.makeText(this, "Exception: ${e.message}", Toast.LENGTH_SHORT).show()
                 dbHelper.close()
@@ -103,13 +98,14 @@ class RegisterActivity : AppCompatActivity() {
         super.onActivityResult(requestCode, resultCode, data)
         if(requestCode == RESULT_PICK_CONTACT){
             try {
-                var uri = data?.data
-                var cursor = contentResolver.query(uri, null, null, null, null)
-                cursor.moveToFirst()
-                var nameIndex = cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME)
-                var phoneIndex = cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER)
-                var contactName = cursor.getString(nameIndex)
-                var contactNumber = cursor.getString(phoneIndex)
+                val uri = data?.data
+                val cursor = contentResolver.query(uri, null, null, null, null)
+                cursor!!.moveToFirst()
+                val nameIndex = cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME)
+                val phoneIndex = cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER)
+                val contactName = cursor.getString(nameIndex)
+                val contactNumber = cursor.getString(phoneIndex)
+                cursor.close()
                 var cleanedContactNumber = ""
                 for (i in contactNumber.length-1 downTo 0){
                     if(contactNumber[i].isDigit()){
@@ -122,9 +118,9 @@ class RegisterActivity : AppCompatActivity() {
                 if(dialogView.isShown){
                     dialogView.findViewById<EditText>(R.id.phoneNoAddContactProfile).setText(cleanedContactNumber)
                 }
-                Log.d("debug", "$contactName -> $cleanedContactNumber")
             }catch (exception: Exception){
                 Log.d("debug", "Exception while picking contact: " + exception.message)
+                Toast.makeText(this, "Error while registering", Toast.LENGTH_SHORT).show()
             }
         }
     }

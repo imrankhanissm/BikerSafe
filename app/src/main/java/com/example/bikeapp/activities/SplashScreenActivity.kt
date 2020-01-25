@@ -3,7 +3,6 @@ package com.example.bikeapp.activities
 import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
-import com.example.bikeapp.R
 
 class SplashScreenActivity : AppCompatActivity() {
 
