@@ -71,8 +71,10 @@ class RegisterActivity : AppCompatActivity() {
                 prefEditor.putString(User.name, usernameRegister.text.toString())
                 prefEditor.putFloat(Constants.Settings.accelerationThreshold, Constants.Settings.accelerationThresholdDefault)
                 prefEditor.putFloat(Constants.Settings.gyroscopeThreshold, Constants.Settings.gyroscopeThresholdDefault)
+                prefEditor.putInt(Constants.Settings.countDownTime, Constants.Settings.countDownTimeDefault)
                 prefEditor.putBoolean(Constants.Settings.sound, true)
                 prefEditor.putBoolean(Constants.Settings.vibrate, true)
+                prefEditor.putBoolean(Constants.Settings.call, false)
 
 
                 for(i in 0 until emergencyContactListRegister.childCount){

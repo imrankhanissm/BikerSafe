@@ -15,36 +15,43 @@ import kotlinx.android.synthetic.main.activity_alert_dialog.*
 
 class AlertDialogActivity : AppCompatActivity() {
 
-    private var waitTime = 15000L
+    private var waitTime = 15000
     private lateinit var mediaPlayer: MediaPlayer
     private lateinit var myPrefs: SharedPreferences
-    private lateinit var vibrater: Vibrator
+    private lateinit var vibrator: Vibrator
+    private var vibrate: Boolean = true
 
-    private var countDownTimer: CountDownTimer = object: CountDownTimer(waitTime, 1000){
-        override fun onFinish() {
-            stopMedia()
-            sendAlert()
-            Toast.makeText(applicationContext, "time up alert sent", Toast.LENGTH_SHORT).show()
-            SensorService.alertActive = false
-            finish()
-        }
-
-        override fun onTick(millisUntilFinished: Long) {
-            secondsAlertDialog.text =  String.format("%d seconds", millisUntilFinished/1000)
-            if(myPrefs.getBoolean(Constants.Settings.vibrate, true)){
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                    vibrater.vibrate(VibrationEffect.createOneShot(250, VibrationEffect.DEFAULT_AMPLITUDE))
-                }else{
-                    vibrater.vibrate(250)
-                }
-            }
-        }
-    }
+    private lateinit var countDownTimer: CountDownTimer
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
         myPrefs = getSharedPreferences(Constants.sharedPrefsName, Context.MODE_PRIVATE)
-        vibrater = getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
+        vibrator = getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
+        waitTime = myPrefs.getInt(Constants.Settings.countDownTime, Constants.Settings.countDownTimeDefault)*1000
+        vibrate = myPrefs.getBoolean(Constants.Settings.vibrate, true)
+
+        countDownTimer = object: CountDownTimer(waitTime.toLong(), 1000){
+            override fun onFinish() {
+                stopMedia()
+                sendAlert()
+                Toast.makeText(applicationContext, "time up alert sent", Toast.LENGTH_SHORT).show()
+                SensorService.alertActive = false
+                finish()
+            }
+
+            override fun onTick(millisUntilFinished: Long) {
+                secondsAlertDialog.text =  String.format("%d seconds", millisUntilFinished/1000)
+                if(vibrate){
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                        vibrator.vibrate(VibrationEffect.createOneShot(250, VibrationEffect.DEFAULT_AMPLITUDE))
+                    }else{
+                        vibrator.vibrate(250)
+                    }
+                }
+            }
+        }
+
         setFinishOnTouchOutside(false)
         setContentView(R.layout.activity_alert_dialog)
         cancel.setOnClickListener {
@@ -74,7 +81,7 @@ class AlertDialogActivity : AppCompatActivity() {
         val location = Location("")
         location.latitude = latitude
         location.longitude = longitude
-        SmsService(this).sendAlertToAll(location)
+        SmsService(this).sendAlertToAll(location, myPrefs.getBoolean("call", false))
         Toast.makeText(applicationContext, "Alert sent", Toast.LENGTH_SHORT).show()
     }
 
@@ -92,10 +99,10 @@ class AlertDialogActivity : AppCompatActivity() {
     }
 
     override fun onBackPressed() {
-        super.onBackPressed()
         stopMedia()
         countDownTimer.cancel()
         SensorService.alertActive = false
         finishAndRemoveTask()
+        super.onBackPressed()
     }
 }

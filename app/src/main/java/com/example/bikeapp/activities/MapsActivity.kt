@@ -111,7 +111,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         }
         LocalBroadcastManager.getInstance(this).registerReceiver(receiver, IntentFilter(Constants.locationFromService))
         LocalBroadcastManager.getInstance(this).registerReceiver(receiver, IntentFilter((Constants.serviceStopped)))
-        ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.SEND_SMS, Manifest.permission.READ_PHONE_STATE), locationPermissionCode)
+        ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.SEND_SMS, Manifest.permission.READ_PHONE_STATE, Manifest.permission.CALL_PHONE), locationPermissionCode)
     }
 
     override fun onResume() {
@@ -153,8 +153,8 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
     }
 
     private fun driveModeOn() {
-        if(ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED || ActivityCompat.checkSelfPermission(this, Manifest.permission.SEND_SMS) != PackageManager.PERMISSION_GRANTED || ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_PHONE_STATE) != PackageManager.PERMISSION_GRANTED){
-            ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.SEND_SMS, Manifest.permission.READ_PHONE_STATE), locationPermissionCode)
+        if(ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED || ActivityCompat.checkSelfPermission(this, Manifest.permission.SEND_SMS) != PackageManager.PERMISSION_GRANTED || ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_PHONE_STATE) != PackageManager.PERMISSION_GRANTED || ActivityCompat.checkSelfPermission(this, Manifest.permission.CALL_PHONE) != PackageManager.PERMISSION_GRANTED){
+            ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.SEND_SMS, Manifest.permission.READ_PHONE_STATE, Manifest.permission.CALL_PHONE), locationPermissionCode)
         }else{
             if(locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)){
 //                myLocFloatingActionButton.setImageResource(R.drawable.ic_directions_bike_color_primary_24dp)
@@ -195,6 +195,12 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
 //                snackBar?.show()
 //            }
 //        }
+        for(i in grantResults){
+            if(i != PackageManager.PERMISSION_GRANTED){
+                Toast.makeText(this, "Permission Required", Toast.LENGTH_SHORT).show()
+                break
+            }
+        }
     }
 
     override fun onMapReady(googleMap: GoogleMap) {
@@ -234,7 +240,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
     }
 
     private fun sendAlert(){
-        lastLocation?.let { SmsService(this).sendAlertToAll(it) }
+        lastLocation?.let { SmsService(this).sendAlertToAll(it, getSharedPreferences(Constants.sharedPrefsName, Context.MODE_PRIVATE).getBoolean(Constants.Settings.call, false)) }
         Toast.makeText(this, "Alert sent from activity", Toast.LENGTH_SHORT).show()
     }
 }

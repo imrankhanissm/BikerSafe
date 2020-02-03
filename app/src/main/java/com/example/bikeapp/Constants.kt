@@ -12,8 +12,11 @@ object Constants {
         const val accelerationThresholdDefault = 12F
         const val gyroscopeThreshold = "gyroscopeThreshold"
         const val gyroscopeThresholdDefault = 12F
+        const val countDownTime = "countDownTime"
+        const val countDownTimeDefault = 15000
         const val sound = "sound"
         const val vibrate = "vibrate"
+        const val call = "call"
     }
 
     object NotificationChannels {

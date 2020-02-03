@@ -109,6 +109,8 @@ class SettingActivity : AppCompatActivity() {
 
         soundSwitch.isChecked = myPrefs.getBoolean(Constants.Settings.sound, true)
         vibrateSwitch.isChecked = myPrefs.getBoolean(Constants.Settings.vibrate, true)
+        callSwitch.isChecked = myPrefs.getBoolean(Constants.Settings.call, true)
+
         soundSwitch.setOnCheckedChangeListener { _, isChecked ->
             if(isChecked){
                 myPrefs.edit().putBoolean(Constants.Settings.sound, true).apply()
@@ -124,6 +126,33 @@ class SettingActivity : AppCompatActivity() {
                 myPrefs.edit().putBoolean(Constants.Settings.vibrate, false).apply()
             }
         }
+
+        callSwitch.setOnCheckedChangeListener { _, isChecked ->
+            if(isChecked){
+                myPrefs.edit().putBoolean(Constants.Settings.call, true).apply()
+            }else{
+                myPrefs.edit().putBoolean(Constants.Settings.call, false).apply()
+            }
+        }
+
+        val countDownTime = myPrefs.getInt(Constants.Settings.countDownTime, Constants.Settings.countDownTimeDefault)
+        countDownTimeSeekBarValue.text = "$countDownTime secs"
+        countDownTimeSeekBar.progress = (countDownTime*100)/120
+        countDownTimeSeekBar.setOnSeekBarChangeListener(object: SeekBar.OnSeekBarChangeListener{
+            override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
+                val waitTime = (progress * 120) / 100
+                countDownTimeSeekBarValue.text = "$waitTime secs"
+            }
+
+            override fun onStartTrackingTouch(seekBar: SeekBar?) {
+            }
+
+            override fun onStopTrackingTouch(seekBar: SeekBar?) {
+                if (seekBar != null) {
+                    myPrefs.edit().putInt(Constants.Settings.countDownTime, (seekBar.progress*120)/100).apply()
+                }
+            }
+        })
     }
 
     private fun generateContactView(contact: Contact): View {
