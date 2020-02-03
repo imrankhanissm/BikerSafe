@@ -4,8 +4,7 @@ import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
 import android.app.Service
-import android.content.Context
-import android.content.Intent
+import android.content.*
 import android.hardware.Sensor
 import android.hardware.SensorEvent
 import android.hardware.SensorEventListener
@@ -48,6 +47,8 @@ class SensorService : Service(), SensorEventListener {
     private var accelerometerMinArray: FloatArray = floatArrayOf(0F, 0F, 0F)
     private var gyroscopeMaxArray: FloatArray = floatArrayOf(0F, 0F, 0F)
     private var gyroscopeMinArray: FloatArray = floatArrayOf(0F, 0F, 0F)
+    private lateinit var receiver: BroadcastReceiver
+    private lateinit var myPrefs: SharedPreferences
 
 
     override fun onBind(intent: Intent): IBinder? {
@@ -66,6 +67,17 @@ class SensorService : Service(), SensorEventListener {
             }
         }
         accelerationThreshold = getSharedPreferences(Constants.sharedPrefsName, Context.MODE_PRIVATE).getFloat(Constants.Settings.accelerationThreshold, accelerationThreshold)
+
+        myPrefs = getSharedPreferences(Constants.sharedPrefsName, Context.MODE_PRIVATE)
+        receiver = object : BroadcastReceiver() {
+            override fun onReceive(context: Context?, intent: Intent?) {
+                Log.d("callContacts", intent?.action)
+                if(intent?.action == Constants.callContacts){
+                    lastLocation?.let { SmsService(applicationContext).sendAlertToAll(it, myPrefs.getBoolean("call", false)) }
+                }
+            }
+        }
+        LocalBroadcastManager.getInstance(this).registerReceiver(receiver, IntentFilter(Constants.callContacts))
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {

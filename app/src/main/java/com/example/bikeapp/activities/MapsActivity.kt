@@ -47,6 +47,8 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
     private lateinit var alertDialog: AlertDialog
     private var lastLocation: Location? = null
     private var snackBar: Snackbar? = null
+    private lateinit var localBroadcastManager: LocalBroadcastManager
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -112,6 +114,8 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         LocalBroadcastManager.getInstance(this).registerReceiver(receiver, IntentFilter(Constants.locationFromService))
         LocalBroadcastManager.getInstance(this).registerReceiver(receiver, IntentFilter((Constants.serviceStopped)))
         ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.SEND_SMS, Manifest.permission.READ_PHONE_STATE, Manifest.permission.CALL_PHONE), locationPermissionCode)
+
+        localBroadcastManager = LocalBroadcastManager.getInstance(this)
     }
 
     override fun onResume() {
@@ -240,7 +244,9 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
     }
 
     private fun sendAlert(){
-        lastLocation?.let { SmsService(this).sendAlertToAll(it, getSharedPreferences(Constants.sharedPrefsName, Context.MODE_PRIVATE).getBoolean(Constants.Settings.call, false)) }
-        Toast.makeText(this, "Alert sent from activity", Toast.LENGTH_SHORT).show()
+        val intent = Intent(Constants.callContacts)
+        localBroadcastManager.sendBroadcast(intent)
+//        lastLocation?.let { SmsService(this).sendAlertToAll(it, getSharedPreferences(Constants.sharedPrefsName, Context.MODE_PRIVATE).getBoolean(Constants.Settings.call, false)) }
+//        Toast.makeText(this, "Alert sent from activity", Toast.LENGTH_SHORT).show()
     }
 }

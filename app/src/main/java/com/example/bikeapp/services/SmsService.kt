@@ -7,6 +7,7 @@ import android.net.Uri
 import android.telephony.PhoneStateListener
 import android.telephony.SmsManager
 import android.telephony.TelephonyManager
+import android.util.Log
 import android.widget.Toast
 import androidx.core.content.ContextCompat
 import com.example.bikeapp.dbHelper.DBHelper
@@ -17,18 +18,28 @@ class SmsService(private val context: Context) {
     private var mapsLink = "https://www.google.com/maps/search/?api=1&query="
     private var smsManager: SmsManager = SmsManager.getDefault()
     private var dbHelper: DBHelper = DBHelper(context)
+    private var contList = mutableListOf<Contact>()
 
-    val phoneStateListener = object: PhoneStateListener(){
+    private val phoneStateListener = object: PhoneStateListener(){
         override fun onCallStateChanged(state: Int, phoneNumber: String?) {
-            Toast.makeText(context, "$state, $phoneNumber", Toast.LENGTH_SHORT).show()
+            if(state == TelephonyManager.CALL_STATE_IDLE){
+                Toast.makeText(context, "idle", Toast.LENGTH_SHORT).show()
+                Log.d("callState", "idle")
+                if(contList.isNotEmpty()){
+                    val contact = contList[0]
+                    contList.removeAt(0)
+                    callPhone(contact)
+                }else{
+                    telephonyManager.listen(null, LISTEN_NONE)
+                }
+            }else if(state == TelephonyManager.CALL_STATE_OFFHOOK) {
+                Toast.makeText(context, "offhook", Toast.LENGTH_SHORT).show()
+            }
         }
-
     }
-    val telephonyManager = context.getSystemService(Context.TELEPHONY_SERVICE) as TelephonyManager
+    private val telephonyManager = context.getSystemService(Context.TELEPHONY_SERVICE) as TelephonyManager
 
     fun sendAlertToAll(location: Location, call: Boolean){
-        telephonyManager.listen(phoneStateListener, PhoneStateListener.LISTEN_CALL_STATE)
-
         val contacts = dbHelper.getContacts()
         if (contacts != null) {
             for(i in contacts){
@@ -36,15 +47,18 @@ class SmsService(private val context: Context) {
                     sendSms(i, location)
                 }
                 if(call) {
-                    callPhone(i)
+//                    callPhone(i)
+                    contList.add(i)
                 }
             }
         }
+        telephonyManager.listen(phoneStateListener, PhoneStateListener.LISTEN_CALL_STATE)
     }
 
     private fun callPhone(i: Contact) {
-        val phonecallIntent = Intent(Intent.ACTION_CALL, Uri.parse("tel:${i.countryCode}${i.phoneNo}"))
-        ContextCompat.startActivity(context, phonecallIntent, null)
+        val phoneCallIntent = Intent(Intent.ACTION_CALL, Uri.parse("tel:${i.countryCode}${i.phoneNo}"))
+        phoneCallIntent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+        ContextCompat.startActivity(context, phoneCallIntent, null)
     }
 
     private fun sendSms(contact: Contact, location: Location){

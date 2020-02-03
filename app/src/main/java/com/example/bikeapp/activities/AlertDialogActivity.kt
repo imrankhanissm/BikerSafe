@@ -1,12 +1,14 @@
 package com.example.bikeapp.activities
 
 import android.content.Context
+import android.content.Intent
 import android.content.SharedPreferences
 import android.location.Location
 import android.media.MediaPlayer
 import android.os.*
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.example.bikeapp.Constants
 import com.example.bikeapp.R
 import com.example.bikeapp.services.SensorService
@@ -14,12 +16,13 @@ import com.example.bikeapp.services.SmsService
 import kotlinx.android.synthetic.main.activity_alert_dialog.*
 
 class AlertDialogActivity : AppCompatActivity() {
-
     private var waitTime = 15000
     private lateinit var mediaPlayer: MediaPlayer
     private lateinit var myPrefs: SharedPreferences
     private lateinit var vibrator: Vibrator
     private var vibrate: Boolean = true
+    private lateinit var localBroadcastManager: LocalBroadcastManager
+
 
     private lateinit var countDownTimer: CountDownTimer
 
@@ -73,16 +76,22 @@ class AlertDialogActivity : AppCompatActivity() {
         mediaPlayer.isLooping = true
         startMedia()
         countDownTimer.start()
+        localBroadcastManager = LocalBroadcastManager.getInstance(this)
     }
 
     private fun sendAlert(){
-        val latitude = intent.extras!!["latitude"] as Double
-        val longitude = intent.extras!!["longitude"] as Double
-        val location = Location("")
-        location.latitude = latitude
-        location.longitude = longitude
-        SmsService(this).sendAlertToAll(location, myPrefs.getBoolean("call", false))
-        Toast.makeText(applicationContext, "Alert sent", Toast.LENGTH_SHORT).show()
+//        val latitude = intent.extras!!["latitude"] as Double
+//        val longitude = intent.extras!!["longitude"] as Double
+//        val location = Location("")
+//        location.latitude = latitude
+//        location.longitude = longitude
+//        SmsService(this).sendAlertToAll(location, myPrefs.getBoolean("call", false))
+//        Toast.makeText(applicationContext, "Alert sent", Toast.LENGTH_SHORT).show()
+
+
+
+        val intent = Intent(Constants.callContacts)
+        localBroadcastManager.sendBroadcast(intent)
     }
 
     private fun startMedia(){
