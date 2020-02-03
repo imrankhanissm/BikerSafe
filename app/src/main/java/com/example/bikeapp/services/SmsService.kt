@@ -10,11 +10,13 @@ import android.telephony.TelephonyManager
 import android.util.Log
 import android.widget.Toast
 import androidx.core.content.ContextCompat
+import com.example.bikeapp.Constants
 import com.example.bikeapp.dbHelper.DBHelper
 import com.example.bikeapp.models.Contact
 
 class SmsService(private val context: Context) {
-    private var message = "Test Accident alert\n"
+    private val myPrefs = context.getSharedPreferences(Constants.sharedPrefsName, Context.MODE_PRIVATE)
+    private var message = (myPrefs?.getString(Constants.Settings.message, "Test Accident alert")) + "\n"
     private var mapsLink = "https://www.google.com/maps/search/?api=1&query="
     private var smsManager: SmsManager = SmsManager.getDefault()
     private var dbHelper: DBHelper = DBHelper(context)
@@ -51,6 +53,9 @@ class SmsService(private val context: Context) {
                     contList.add(i)
                 }
             }
+        }
+        if(contList.isEmpty()){
+            return
         }
         telephonyManager.listen(phoneStateListener, PhoneStateListener.LISTEN_CALL_STATE)
     }

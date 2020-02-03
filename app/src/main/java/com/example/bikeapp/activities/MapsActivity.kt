@@ -23,9 +23,7 @@ import androidx.core.content.ContextCompat
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.example.bikeapp.Constants
 import com.example.bikeapp.R
-import com.example.bikeapp.models.User
 import com.example.bikeapp.services.SensorService
-import com.example.bikeapp.services.SmsService
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
@@ -52,9 +50,8 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        Log.d("lifecycle", "onCreate")
         val myPrefs = getSharedPreferences(Constants.sharedPrefsName, Context.MODE_PRIVATE)
-        if(!myPrefs.contains(User.name)){
+        if(!myPrefs.contains(Constants.Settings.username)){
             startActivity(Intent(this, RegisterActivity::class.java))
             finish()
             return

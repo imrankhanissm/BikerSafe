@@ -14,7 +14,6 @@ import com.example.bikeapp.Constants
 import com.example.bikeapp.R
 import com.example.bikeapp.dbHelper.DBHelper
 import com.example.bikeapp.models.Contact
-import com.example.bikeapp.models.User
 import com.example.bikeapp.services.SensorService
 import kotlinx.android.synthetic.main.activity_setting.*
 
@@ -32,7 +31,7 @@ class SettingActivity : AppCompatActivity() {
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         supportActionBar?.title = "Setting"
         myPrefs = getSharedPreferences(Constants.sharedPrefsName, Context.MODE_PRIVATE)
-        usernameProfile.text = myPrefs.getString(User.name, null)
+        usernameProfile.text = myPrefs.getString(Constants.Settings.username, "Username")
 
         usernameProfileContainer.setOnClickListener {
             val dialogBuilder = AlertDialog.Builder(this)
@@ -47,7 +46,7 @@ class SettingActivity : AppCompatActivity() {
                 val newName = (dialog as AlertDialog).findViewById<EditText>(R.id.mapsMenuProfileEdit)?.text.toString()
                 Log.d("debug", newName)
 
-                myPrefs.edit().putString(User.name, newName).apply()
+                myPrefs.edit().putString(Constants.Settings.username, newName).apply()
                 usernameProfile.text = newName
             }
             dialogBuilder.show()
@@ -88,12 +87,12 @@ class SettingActivity : AppCompatActivity() {
         }
 
         val accelerationThreshold = myPrefs.getFloat(Constants.Settings.accelerationThreshold, Constants.Settings.accelerationThresholdDefault)
-        accelerationThresholdSetting.text = String.format("%d G", accelerationThreshold.toInt())
+        accelerationThresholdSetting.text = String.format("%d " + getString(R.string.m_s2), accelerationThreshold.toInt())
         accelerationSeekBarSetting.progress = accelerationThreshold.toInt()
 
         accelerationSeekBarSetting.setOnSeekBarChangeListener(object: SeekBar.OnSeekBarChangeListener{
             override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
-                accelerationThresholdSetting.text = String.format("%d G", progress)
+                accelerationThresholdSetting.text = String.format("%d " + getString(R.string.m_s2), progress)
             }
 
             override fun onStartTrackingTouch(seekBar: SeekBar?) {
@@ -153,6 +152,26 @@ class SettingActivity : AppCompatActivity() {
                 }
             }
         })
+
+        message.text = myPrefs.getString(Constants.Settings.message, "Test Accident alert")
+        messageContainer.setOnClickListener {
+            val dialogBuilder = AlertDialog.Builder(this)
+            val dialogView = layoutInflater.inflate(R.layout.dialog_edit_name, null)
+            dialogView.findViewById<EditText>(R.id.mapsMenuProfileEdit)?.setText(message.text)
+            dialogBuilder.setView(dialogView)
+            dialogBuilder.setTitle("Edit Message")
+            dialogBuilder.setNegativeButton("cancel") { dialog, _ ->
+                dialog.dismiss()
+            }
+            dialogBuilder.setPositiveButton("save") { dialog, _ ->
+                val newMessage = (dialog as AlertDialog).findViewById<EditText>(R.id.mapsMenuProfileEdit)?.text.toString()
+                Log.d("debug", newMessage)
+
+                myPrefs.edit().putString(Constants.Settings.message, newMessage).apply()
+                message.text = newMessage
+            }
+            dialogBuilder.show()
+        }
     }
 
     private fun generateContactView(contact: Contact): View {

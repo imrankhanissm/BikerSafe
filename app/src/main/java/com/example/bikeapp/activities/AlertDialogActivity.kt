@@ -29,6 +29,13 @@ class AlertDialogActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        if(!SensorService.alertActive){
+            val mapsIntent = Intent(this, MapsActivity::class.java)
+            startActivity(mapsIntent)
+            finish()
+            return
+        }
+
         myPrefs = getSharedPreferences(Constants.sharedPrefsName, Context.MODE_PRIVATE)
         vibrator = getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
         waitTime = myPrefs.getInt(Constants.Settings.countDownTime, Constants.Settings.countDownTimeDefault)*1000
@@ -40,7 +47,7 @@ class AlertDialogActivity : AppCompatActivity() {
                 sendAlert()
                 Toast.makeText(applicationContext, "time up alert sent", Toast.LENGTH_SHORT).show()
                 SensorService.alertActive = false
-                finish()
+                finishAndRemoveTask()
             }
 
             override fun onTick(millisUntilFinished: Long) {

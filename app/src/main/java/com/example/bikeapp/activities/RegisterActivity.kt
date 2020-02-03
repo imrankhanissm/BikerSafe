@@ -14,7 +14,6 @@ import com.example.bikeapp.Constants
 import com.example.bikeapp.R
 import com.example.bikeapp.dbHelper.DBHelper
 import com.example.bikeapp.models.Contact
-import com.example.bikeapp.models.User
 import kotlinx.android.synthetic.main.activity_register.*
 
 class RegisterActivity : AppCompatActivity() {
@@ -68,7 +67,7 @@ class RegisterActivity : AppCompatActivity() {
             val dbHelper = DBHelper(this)
             val prefEditor = myPrefs.edit()
             try {
-                prefEditor.putString(User.name, usernameRegister.text.toString())
+                prefEditor.putString(Constants.Settings.username, usernameRegister.text.toString())
                 prefEditor.putFloat(Constants.Settings.accelerationThreshold, Constants.Settings.accelerationThresholdDefault)
                 prefEditor.putFloat(Constants.Settings.gyroscopeThreshold, Constants.Settings.gyroscopeThresholdDefault)
                 prefEditor.putInt(Constants.Settings.countDownTime, Constants.Settings.countDownTimeDefault)

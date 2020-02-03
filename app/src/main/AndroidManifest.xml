@@ -50,7 +50,7 @@
 
         <activity
             android:name=".activities.MapsActivity"
-            android:launchMode="singleTask"></activity>
+            android:launchMode="singleTask"/>
         <activity android:name=".activities.SettingActivity" />
         <activity android:name=".activities.RegisterActivity" />
         <activity
